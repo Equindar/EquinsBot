@@ -1,0 +1,55 @@
+@bot.command()
+async def warband(ctx, *, content:str):
+    embed=discord.Embed(color=0xff0000)
+    args = content.strip().split(" ")
+    print(args[0])
+    print(args[1])
+    if(args[0].lower() == "warrior"):
+        x = int(args[1])
+        sum = 20 * x + (5 * x * (x -1) / 2)
+        embed.set_thumbnail(url="https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/a/a4/Warrior-40x40.png")
+        embed.add_field(name=str(x) + "Warriors:", value=sum, inline=True)
+#    if(args[0].lower() == "axe-thrower"):
+#        int(args[1])
+#      sum = 25 * args[1] + (5 * args[1] * (args[1] -1) / 2)
+#        embed.set_thumbnail(url="https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/2/2c/AxeThrower-40x40.png")
+#        embed.add_field(name="Axe Throwers: " + str(args[1]), value=sum, inline=True)
+#    if(args[0].lower() == "shield-bearer"):
+#        int(args[1])
+#        sum = 25 * args[1] + (5 * args[1] * (args[1] -1) / 2)
+#        embed.set_thumbnail(url="https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/1/12/ShieldBearer-40x40.png")
+#        embed.add_field(name="Shield Bearers: " + str(args[1]), value=sum, inline=True)
+#    if(args[0].lower() == "skirmisher"):
+#        int(args[1])
+#        sum = 15 * args[1] + (5 * args[1] * (args[1] -1) / 2)
+#        embed.set_thumbnail(url="https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/4/4a/Skirmisher-40x40.png")
+#        embed.add_field(name="Skirmishers: " + str(args[1]), value=sum, inline=True)
+#    if(args[0].lower() == "dragonkin"):
+#        int(args[1])
+#        sum = 50 * args[1] + (5 * args[1] * (args[1] -1) / 2)
+#        embed.set_thumbnail(url="https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/b/b9/Dragonkin-40x40.png")
+#        embed.add_field(name="Dragonkins: " + str(args[1]), value=sum, inline=True)
+#    if(args[0].isdigit()):
+#        int(args[0])
+#        sum = 20 * args[0] + (5 * args[0] * (args[0] -1) / 2)
+#        embed.set_thumbnail(url="https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/a/a4/Warrior-40x40.png")
+#        embed.add_field(name="Warriors: " + str(args[0]), value=sum, inline=True)
+#        if(args[1].isdigit()):
+#            int(args[1])
+#            sum1 = 25 * args[1] + (5 * args[1] * (args[1] -1) / 2)
+#            embed.add_field(name="Axe Throwers: " + str(args[1]), value=sum1, inline=True)
+#            if(args[2].isdigit()):
+#                int(args[2])
+#                sum2 = 25 * args[2] + (5 * args[2] * (args[2] -1) / 2)
+#                embed.add_field(name="Shield Bearers: " + str(args[2]), value=sum2, inline=True)
+#                if(args[3].isdigit()):
+#                    int(args[3])
+#                    sum3 = 15 * args[3] + (5 * args[3] * (args[3] -1) / 2)
+#                    embed.add_field(name="Skirmishers: " + str(args[3]), value=sum3, inline=True)
+#                    if(args[4].isdigit()):
+#                        int(args[4])
+#                        sum4 = 50 * args[4] + (5 * args[4] * (args[4] -1) / 2)
+#                        embed.add_field(name="Dragonkins: " + str(args[4]), value=sum4, inline=True)
+#            embed.set_thumbnail(url="https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/1/16/Barricades-42x42.png")
+    await ctx.send("used Feature: Warband Cost Calculator")
+    await ctx.send(embed=embed)
