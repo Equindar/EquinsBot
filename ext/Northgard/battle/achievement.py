@@ -69,7 +69,7 @@ class Achievements:
                     await db.execute("INSERT INTO playerachievements (PlayerID, AchievementID) VALUES (?,?)", (player[0], achievement[0]))
                     await db.commit()
                     await ctx.send("Achievement '%s' got sucessfully assigned to Player '%s'." % (achievement[1], target))
-                    await self.bot.get_guild(self.bot.northgardbattle).get_member(player[1]).send("Congratulations! You have got a new Achievement on NorthgardBattle:\n`%s`" % (achievement[1]))
+                    await self.bot.get_guild(self.bot.northgardbattle).get_member(player[1]).send("Congratulations! You have got a new Achievement on Northgard Battle:\n`%s`" % (achievement[1]))
                 else:
                     return await ctx.send("Player not found (Name: %s)" % (target))
             else:
