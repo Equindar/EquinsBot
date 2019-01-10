@@ -333,6 +333,23 @@ class Team:
         print("Here: !team disband")
 
 
+    # delete_team(): async
+    @team.command(name="delete", hidden = True)
+    @commands.is_owner()
+    async def delete_team(self, ctx, *, name: str):
+        """delete a Team"""
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ?;", (name, ))
+            team = await cursor.fetchone()
+            await cursor.close()
+            if team is not None:
+                await db.execute("DELETE FROM team WHERE TeamID = ?;", ( team[0], ))
+                await db.commit()
+                return await ctx.send(f"Team {name} got successfully deleted.")
+            else:
+                await ctx.send(f"Team {name} not found.")
+
+
     # [DEV] dummy(): async
     @team.command(name="dummy", hidden = True)
     async def dummy_team(self, ctx):
