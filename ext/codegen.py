@@ -30,17 +30,17 @@ class CodeGen:
 
 
     # get_code(): async
-    @commands.command(name="code", hidden = True)
+    @commands.command(name="code", hidden=True)
     async def get_code(self, ctx, blocks: int, size: int, amount: int = 1, delimiter: str = "-"):
         """generating Codes"""
         result = ""
         list = self.generate(blocks, size, amount, delimiter)
         for item in list:
-            result += "`"+ item +"`\n"
+            result += f"`{item}`\n"
         embed = discord.Embed(colour=3158584)
-        embed.set_footer(text='--- Blocks: %d --- || --- Block-Size: %d ---' % (blocks, size))
-        embed.add_field(name='Code Generator ('+ str(amount) +')', value=result, inline = True)
-        await ctx.send(content='used Feature: CodeGen `' + ctx.message.content + '`', embed=embed)
+        embed.set_footer(text=f"--- Blocks: {blocks} --- || --- Block-Size: {size} ---")
+        embed.add_field(name=f"Code Generator ({amount})", value=result, inline=True)
+        await ctx.send(content=f"used Feature: CodeGen `{ctx.message.content}`", embed=embed)
 
 
 # --- routine: setup/assign cog

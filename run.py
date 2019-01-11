@@ -10,9 +10,10 @@ extensions = ['ext.system',
               'ext.errors',
               'ext.codegen',
               'ext.dev',
-              'ext.Northgard.init']
+              'ext.Northgard.init'
+             ]
 # initialize the bot
-bot = commands.Bot(command_prefix='!', description='''A universal Discord Bot by Equindar''')
+bot = commands.Bot(command_prefix='!', description="A universal Discord Bot by Equindar")
 bot.log = 521619613708976135
 
 # --- main
@@ -21,15 +22,15 @@ if __name__ == '__main__':
         try:
             bot.load_extension(ext)
         except Exception as e:
-            print(f'Failed to load extension {ext}.', file=sys.stderr)
+            print(f"Failed to load extension {ext}.", file=sys.stderr)
             traceback.print_exc()
-        print(f'[System] Bot Extension: {ext} loaded.')
+        print(f"[System] Bot Extension: {ext} loaded.")
 
 # bot event on_ready()
 @bot.event
 async def on_ready():
-    print('[Bot] Logging in...')
-    print('[Bot] Identity: %s [ID: %s]' % (bot.user.name, bot.user.id))
+    print("[Bot] Logging in...")
+    print(f"[Bot] Identity: {bot.user.name} [ID: {bot.user.id}]")
 
 # run the bot
 bot.run(AUTHKEY, bot=True, reconnect=True)

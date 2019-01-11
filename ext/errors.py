@@ -19,10 +19,12 @@ class Errors:
         # Logging error
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if not isinstance(ctx.message.channel, discord.DMChannel):
-            source = "%s|%s|%s" % (ctx.guild.name, ctx.author, ctx.channel.name)
+            source = f"{ctx.guild.name}|{ctx.author}|{ctx.channel.name}"
         else:
-            source = "DirectMessage|%s" % (ctx.author)
-        await self.bot.get_channel(self.bot.log).send("`❌` `⏱️ %s` [%s] issued: `%s`\n```Error: %s```" % (timestamp, source, ctx.message.content, error))
+            source = f"DirectMessage|{ctx.author}"
+        await self.bot.get_channel(self.bot.log).send(
+            f"""`❌` `⏱️ {timestamp}` [{source}] issued: `{ctx.message.content}`\n
+                ```Error: {error}```""")
 
         # prevent execution of custom on_error handler
         if hasattr(ctx.command, 'on_error'):
@@ -36,19 +38,19 @@ class Errors:
 
         # DisabledCommand procedure
         elif isinstance(error, commands.DisabledCommand):
-            return await ctx.send(f'{ctx.command} has been disabled.')
+            return await ctx.send(f"{ctx.command} has been disabled.")
 
         elif isinstance(error, commands.NoPrivateMessage):
             try:
-                return await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
+                return await ctx.author.send(f"{ctx.command} can not be used in Private Messages.")
             except:
                 pass
 
         elif isinstance(error, commands.BadArgument):
             if ctx.command.qualified_name == 'tag list':
-                return await ctx.send('I could not find that member. Please try again.')
+                return await ctx.send("I could not find that member. Please try again.")
 
-        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+        print(f"Ignoring exception in command {ctx.command}:", file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 # --- routine: setup/assign cog

@@ -330,7 +330,19 @@ class Team:
     @commands.guild_only()
     async def disband_team(self, ctx):
         """disband the Team"""
-        print("Here: !team disband")
+        #TO-DO: check for invoker in a team
+        await ctx.send("Are you sure, you want to disband your Team?\nThis action cannot be reverted.\nType `disband` to confirm...")
+
+        def check(msg):
+            return msg.content == 'disband' and msg.channel == ctx.channel
+
+        try:
+            reply = await self.bot.wait_for('message', check=check, timeout=10.0)
+        except asyncio.TimeoutError:
+            await ctx.send("Your Team-Disband request (10sec) timed out. Retry...")
+        else:
+            # TO-DO: database operations
+            await ctx.send("You successfully disbanded your Team")
 
 
     # delete_team(): async

@@ -1,5 +1,6 @@
 # --- imports
 import discord
+import asyncio
 from discord.ext import commands
 from datetime import datetime
 
@@ -18,17 +19,17 @@ class DEV:
 
 
     # info(): async
-    @commands.group(hidden = True)
+    @commands.group(hidden=True)
     @commands.guild_only()
     @commands.is_owner()
     async def info(self, ctx):
         """display information"""
         if ctx.invoked_subcommand is None:
-            await ctx.send('no param...')
+            await ctx.send("No param...")
 
 
     # server_info(): async
-    @info.command(name="server", hidden = True)
+    @info.command(name="server", hidden=True)
     async def server_info(self, ctx):
         """display server information"""
         s = ctx.guild
@@ -37,39 +38,39 @@ class DEV:
         dict = {
             'Name': s.name,
             'ID': s.id,
-            'Owner': "%s [ID: %d]" % (s.owner.name, s.owner.id)
+            'Owner': f"{s.owner.name} [ID: {s.owner.id}]"
         }
 
         for k,v in dict.items():
-            data += k + '\n'
-            value += str(v) + '\n'
-        embed = discord.Embed(title='__'+ s.name +'__',colour=3158584)
-        embed.set_footer(text='--- Server information ---')
-        embed.add_field(name='Data', value=data, inline = True)
-        embed.add_field(name='Value', value=value, inline = True)
-        await ctx.send(content='used `' + ctx.message.content + '`', embed=embed)
+            data += f"{k}\n"
+            value += f"{v}\n"
+        embed = discord.Embed(title=f"__{s.name}__",colour=3158584)
+        embed.set_footer(text="--- Server information ---")
+        embed.add_field(name="Data", value=data, inline=True)
+        embed.add_field(name="Value", value=value, inline=True)
+        await ctx.send(content=f"used `{ctx.message.content}`", embed=embed)
 
 
     # category_info(): async
-    @info.command(name="category", hidden = True)
+    @info.command(name="category", hidden=True)
     async def category_info(self, ctx):
         """display category information"""
         name = ""
         id = ""
 
         for item in ctx.guild.categories:
-            name += '`#%d` %s \u200b \u200b \u200b\n' % (item.position, item.name)
-            id += str(item.id) + '\n'
+            name += f"`#{item.position}` {item.name} \u200b \u200b \u200b\n"
+            id += f"{item.id}\n"
 
-        embed = discord.Embed(title='__'+ ctx.guild.name +'__',colour=3158584)
-        embed.set_footer(text='--- Category information ---')
-        embed.add_field(name='Name', value=name, inline = True)
-        embed.add_field(name='ID', value=id, inline = True)
-        await ctx.send(content='used `' + ctx.message.content + '`', embed=embed)
+        embed = discord.Embed(title=f"__{ctx.guild.name}__",colour=3158584)
+        embed.set_footer(text="--- Category information ---")
+        embed.add_field(name="Name", value=name, inline=True)
+        embed.add_field(name="ID", value=id, inline=True)
+        await ctx.send(content=f"used `{ctx.message.content}`", embed=embed)
 
 
     # channel_info(): async
-    @info.command(name="channel", hidden = True)
+    @info.command(name="channel", hidden=True)
     async def channel_info(self, ctx, type: str = "text"):
         """display roles information"""
         name = ""
@@ -78,36 +79,36 @@ class DEV:
         for item in ctx.guild.channels:
             if type == "text":
                 if isinstance(item, discord.TextChannel):
-                    name += '`#%d` %s \u200b \u200b \u200b\n' % (item.position, item.name)
-                    id += str(item.id) + '\n'
+                    name += f"`#{item.position}` {item.name} \u200b \u200b \u200b\n"
+                    id += f"{item.id}\n"
             else:
                 if isinstance(item, discord.VoiceChannel):
-                    name += '`#%d` %s \u200b \u200b \u200b\n' % (item.position, item.name)
-                    id += str(item.id) + '\n'
+                    name += f"`#{item.position}` {item.name} \u200b \u200b \u200b\n"
+                    id += f"{item.id}\n"
 
-        embed = discord.Embed(title='__'+ ctx.guild.name +'__',colour=3158584)
-        embed.set_footer(text='--- Channel information ---')
-        embed.add_field(name='Name', value=name, inline = True)
-        embed.add_field(name='ID', value=id, inline = True)
-        await ctx.send(content='used `' + ctx.message.content + '`', embed=embed)
+        embed = discord.Embed(title=f"__{ctx.guild.name}__",colour=3158584)
+        embed.set_footer(text="--- Channel information ---")
+        embed.add_field(name="Name", value=name, inline=True)
+        embed.add_field(name="ID", value=id, inline=True)
+        await ctx.send(content=f"used `{ctx.message.content}`", embed=embed)
 
 
     # roles_info(): async
-    @info.command(name="roles", hidden = True)
+    @info.command(name="roles", hidden=True)
     async def roles_info(self, ctx):
         """display roles information"""
         name = ""
         id = ""
 
         for item in ctx.guild.roles:
-            name += '%s \u200b \u200b \u200b\n' % (item.name.replace("@","\@"))
-            id += str(item.id) + '\n'
+            name += "{} \u200b \u200b \u200b\n".format(item.name.replace("@","\@"))
+            id += f"{item.id}\n"
 
-        embed = discord.Embed(title='__'+ ctx.guild.name +'__',colour=3158584)
-        embed.set_footer(text='--- Role information ---')
-        embed.add_field(name='Name', value=name, inline = True)
-        embed.add_field(name='ID', value=id, inline = True)
-        await ctx.send(content='used `' + ctx.message.content + '`', embed=embed)
+        embed = discord.Embed(title=f"__{ctx.guild.name}__",colour=3158584)
+        embed.set_footer(text="--- Role information ---")
+        embed.add_field(name="Name", value=name, inline=True)
+        embed.add_field(name="ID", value=id, inline=True)
+        await ctx.send(content=f"used `{ctx.message.content}`", embed=embed)
 
 
     @commands.command()
@@ -142,47 +143,34 @@ class DEV:
     # myroles(): async
     # Check this:
     # " ".join(r.name.replace("@",\@") for r in ctx.guild.roles)
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     @commands.guild_only()
     async def myroles(self, ctx):
         member = ctx.guild.get_member(ctx.message.author.id)
         for role in member.roles:
             if role.name != "@everyone":
-                await ctx.send("Role: %s [ID: %d]" % (role.name, role.id))
+                await ctx.send(f"Role: {role.name} [ID: {role.id}]")
 
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def bla(self, ctx):
         """bla test funtion"""
-        await ctx.send("BlaBlaBla...")
-#        await ctx.send('I am Staff')
-#        await ctx.send('My ID: #' + str(ctx.author.id))
+        #TO-DO: check for invoker in a team
+        await ctx.send("Are you sure, you want to disband your Team?\nThis action cannot be reverted.\nType `disband` to confirm...")
 
-        # send a user a DM
-#        return await self.bot.get_guild(self.server).get_member(362347317724184580).send("test")
+        def check(msg):
+            return msg.content == 'disband' and msg.channel == ctx.channel
 
-#        print(self.bot.get_guild(self.server).get_member(ctx.author.id).avatar_url)
+        try:
+            reply = await self.bot.wait_for('message', check=check, timeout=10.0)
+        except asyncio.TimeoutError:
+            await ctx.send("Your Team-Disband request (10sec) timed out. Retry...")
+        else:
+            # TO-DO: database operations
+            await ctx.send("You successfully disbanded your Team")
 
-
-#    @commands.command(hidden = True)
-#    @commands.is_owner()
-#    async def info(self, ctx):
-#        """Displaying Data"""
-#        await ctx.send("Server '%s':\nID: %s" % (ctx.guild.name, ctx.guild.id))
-#        await ctx.send("Category '%s':\nID: %s" % (ctx.channel.category.name, ctx.channel.category_id))
-#        await ctx.send("Channel '%s':\nID: %s" % (ctx.channel.name, ctx.channel.id))
-
-
-    @commands.command()
-    @commands.is_owner()
-    async def test_db(self, ctx):
-        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            async with db.execute('SELECT * FROM clan') as cursor:
-                async for row in cursor:
-                    print(row)
-        return True
 
 
 #@bot.command()
@@ -195,9 +183,6 @@ class DEV:
 #    embed.add_field(name="XP", value=80, inline=True)
 #    await ctx.send(embed=embed)
 
-#@bot.command()
-#async def echo(ctx, *, content:str):
-#    await ctx.send(content)
 
 # --- routine: setup/assign cog
 def setup(bot):

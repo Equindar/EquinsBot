@@ -25,7 +25,7 @@ class Northgard:
             except Exception as e:
                 print(f'Failed to load Northgard module {module}.', file=sys.stderr)
                 traceback.print_exc()
-            print("[System] Northgard Module: %s loaded" % (module))
+            print(f"[System] Northgard Module: {module} loaded")
 
     # online(): async
     @commands.command()
@@ -38,7 +38,7 @@ class Northgard:
                     result = "Players online in Northgard: " + str(data['response']['player_count'])
                     await ctx.send(result)
 
-    @commands.command(name="help-out", hidden = True)
+    @commands.command(name="help-out", hidden=True)
     @commands.is_owner()
     async def helpout_user(self, ctx, *, target: str):
         """sends a Help-Out Message to a known User"""
