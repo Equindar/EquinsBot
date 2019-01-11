@@ -23,7 +23,7 @@ class Match:
     async def show_match(self, ctx):
         """Display a Match"""
         print("Here: !match show")
-        print("%s: %s" % (cty.command.cog_name, ctx.command.name))
+        print("%s: %s" % (ctx.command.cog_name, ctx.command.name))
 
     # add_match(): async
     @match.command(name="add")
