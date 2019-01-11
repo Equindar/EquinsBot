@@ -115,15 +115,19 @@ class DEV:
     @commands.is_owner()
     async def test(self, ctx):
         """DEV function !test for testing"""
-        overwrites = {
-            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
-        }
-        category = await ctx.guild.create_category_channel("Tournament Dummy", overwrites=overwrites)
-        await category.edit(position=1)
-        ch_info     = await ctx.guild.create_text_channel("Information", category=category)
-        ch_bracket  = await ctx.guild.create_text_channel("Bracket", category=category)
-        ch_question = await ctx.guild.create_text_channel("Questions", category=category)
+
+        for member in ctx.guild.members:
+            if member.bot:
+                return await ctx.send(f"Found a freaking Bot: called {member.name}")
+#        overwrites = {
+#            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+#            ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
+#        }
+#        category = await ctx.guild.create_category_channel("Tournament Dummy", overwrites=overwrites)
+#        await category.edit(position=1)
+#        ch_info     = await ctx.guild.create_text_channel("Information", category=category)
+#        ch_bracket  = await ctx.guild.create_text_channel("Bracket", category=category)
+#        ch_question = await ctx.guild.create_text_channel("Questions", category=category)
 
 
 #        overwrite = PermissionOverwrite(self.bot.get_guild(self.server).get_role(514423325049618460).permissions)
@@ -133,19 +137,6 @@ class DEV:
 #            if item.name == "Test":
 #                print(item.id)
 
-
-# --- Delete category by ID
-#        for item in self.bot.get_guild(self.server).categories:
-#            if item.id == 531822368897630208:
-#                await item.delete(reason = "Test Delete...")
-#            print("ID: %d - %s" % (item.id, item.name))
-
-
-#        print(self.get_guild().name)       #failed
-#        print(self.bot.get_guild())        # no ID
-#        print(self.bot.get_guild().name)   # no ID
-#        print(ctx.get_guild().name)        # no ID
-#        print(ctx.get_channel().id)        # no ID
 
 
     # myroles(): async
@@ -165,6 +156,7 @@ class DEV:
     @commands.is_owner()
     async def bla(self, ctx):
         """bla test funtion"""
+        await ctx.send("BlaBlaBla...")
 #        await ctx.send('I am Staff')
 #        await ctx.send('My ID: #' + str(ctx.author.id))
 
