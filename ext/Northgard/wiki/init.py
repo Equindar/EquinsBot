@@ -11,6 +11,7 @@ class Wiki:
     def __init__(self, bot):
         self.bot = bot
 
+
     # knowledge(): async
     @commands.command()
     async def knowledge(self, ctx):

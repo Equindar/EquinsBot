@@ -21,11 +21,11 @@ class Tournament:
 
 
     # tournament(): async
-    @commands.group(hidden = True)
+    @commands.group(hidden=True)
     async def tournament(self, ctx):
         """Manage the Tournament"""
         if ctx.invoked_subcommand is None:
-            await ctx.send('no param...')
+            await ctx.send("No param...")
 
 
     # create_tournament(): async
@@ -39,7 +39,8 @@ class Tournament:
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False)
         }
         ow_info = {
-            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False, read_message_history=True, add_reactions=False )
+            ctx.guild.default_role: discord.PermissionOverwrite(
+                read_messages=True, send_messages=False, read_message_history=True, add_reactions=False)
         }
         ow_bracket = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=True)
@@ -49,13 +50,13 @@ class Tournament:
         }
 
         # create category
-        category = await ctx.guild.create_category_channel('['+ name +']', overwrites=ow_category)
+        category = await ctx.guild.create_category_channel(f"[{name}]", overwrites=ow_category)
         await category.edit(position=2)
         # create channels
         ch_info     = await ctx.guild.create_text_channel("Information", category=category)
         ch_bracket  = await ctx.guild.create_text_channel("Bracket", category=category, overwrites=ow_bracket)
         ch_question = await ctx.guild.create_text_channel("Questions", category=category)
-        ch_results = await ctx.guild.create_text_channel("Match Results", category=category)
+        ch_results  = await ctx.guild.create_text_channel("Match Results", category=category)
         # set channel perms
         await ch_info.set_permissions(ow_info)
         await ctx.send("Tournament got set up.")
@@ -75,7 +76,11 @@ class Tournament:
     @commands.guild_only()
     async def deadline(self, ctx):
         """[DEV] Deadline Display"""
-        emoji = { 0:':zero:', 1:':one:', 2:':two:', 3:':three:', 4:':four:', 5:":five:", 6:":six:", 7:":seven:", 8:":eight:", 9:":nine:"}
+        emoji = {
+            0:':zero:', 1:':one:', 2:':two:', 3:':three:', 4:':four:',
+            5:":five:", 6:":six:", 7:":seven:", 8:":eight:", 9:":nine:"
+        }
+
         now = datetime.now()
         date = datetime(2018,12,15,12,0,0)
         # create dict
@@ -99,7 +104,6 @@ class Tournament:
         embed = discord.Embed(colour=6809006, timestamp = date - timedelta(hours=1))
         embed.add_field(name='aXe-Mas Tournament starting in...', value=':stopwatch: ' + x)
         await ctx.send(content='used Feature: Deadline `!deadline`', embed=embed)
-
 
 
 # --- routine: setup/assign cog

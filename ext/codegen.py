@@ -37,6 +37,7 @@ class CodeGen:
         list = self.generate(blocks, size, amount, delimiter)
         for item in list:
             result += f"`{item}`\n"
+            
         embed = discord.Embed(colour=3158584)
         embed.set_footer(text=f"--- Blocks: {blocks} --- || --- Block-Size: {size} ---")
         embed.add_field(name=f"Code Generator ({amount})", value=result, inline=True)

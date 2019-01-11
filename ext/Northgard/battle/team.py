@@ -19,7 +19,12 @@ class Team:
     async def myteam(self, ctx):
         """display your Team profile"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("SELECT team.Name FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID WHERE player.Name = ?;", (ctx.author.name,))
+            cursor = await db.execute("""
+                SELECT team.Name
+                FROM team
+                LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                WHERE player.Name = ?;""", (ctx.author.name,))
             result = await cursor.fetchone()
             await cursor.close()
         if result is not None:
@@ -33,7 +38,7 @@ class Team:
     async def team(self, ctx):
         """manage your Team"""
         if ctx.invoked_subcommand is None:
-            await ctx.send('no param...')
+            await ctx.send("No param...")
 
 
     # show_team(): async
@@ -44,7 +49,17 @@ class Team:
             roster = ""
             points = 0
             members = 0
-            cursor = await db.execute("SELECT team.Name, team.Description, role.Name, player.Name, player.Steam, player.Points, team.TeamID, team.Registration, status.Value FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN role ON role.RoleID = teamplayer.RoleID LEFT JOIN player ON teamplayer.PlayerID = player.PlayerID LEFT JOIN status ON status.StatusID = team.StatusID WHERE team.name = ? ORDER BY role.RoleID ASC;", (name,))
+            cursor = await db.execute("""
+                SELECT
+                    team.Name, team.Description, role.Name, player.Name, player.Steam,
+                    player.Points, team.TeamID, team.Registration, status.Value
+                FROM team
+                LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                LEFT JOIN role ON role.RoleID = teamplayer.RoleID
+                LEFT JOIN player ON teamplayer.PlayerID = player.PlayerID
+                LEFT JOIN status ON status.StatusID = team.StatusID
+                WHERE team.name = ?
+                ORDER BY role.RoleID ASC;""", (name,))
             team = await cursor.fetchall()
             await cursor.close()
 
@@ -54,15 +69,15 @@ class Team:
                     name = ""
                     if member[3] is not None:
                         if member[4] is not None:
-                            name = "[%s](%s)" % (member[3], member[4])
+                            name = f"[{member[3]}]({member[4]})"
                         else:
                             name = member[3]
                         if member[2][5:] == "Substitute":
-                            roster += "`%s:` %s\n" % (member[2][5:], name)
+                            roster += f"`{member[2][5:]}:` {name}\n"
                         elif member[2][5:] == "Manager":
-                            roster += "`%s \u200b \u200b \u200b:` %s\n" % (member[2][5:], name)
+                            roster += f"`{member[2][5:]} \u200b \u200b \u200b:` {name}\n"
                         else:
-                            roster += "`%s \u200b \u200b \u200b \u200b:` %s\n" % (member[2][5:], name)
+                            roster += f"`{member[2][5:]} \u200b \u200b \u200b \u200b:` {name}\n"
                         points += member[5]
                         members += 1
                     else:
@@ -74,16 +89,16 @@ class Team:
                 else:
                     desc = team[0][1]
 
-                embed = discord.Embed(title='__'+ team[0][0]+'__',description=desc,colour=6809006)
+                embed = discord.Embed(title=f"__{team[0][0]}__",description=desc,colour=6809006)
                 embed.set_thumbnail(url = "https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/d/d4/Tactician_icon.png")
-                embed.set_footer(text='--- Team-ID: #'+ str(team[0][6])+' --- || --- Registered: '+ team[0][7][:-7] +' --- || --- Status: '+ team[0][8]+' ---')
-                embed.add_field(name='Team Roster', value=roster, inline = True)
-                embed.add_field(name='Performance', value='**--- %.2f pts ---**' % (points / members), inline = True)
+                embed.set_footer(text=f"--- Team-ID: #{team[0][6]} --- || --- Registered: {team[0][7][:-7]} --- || --- Status: {team[0][8]} ---")
+                embed.add_field(name="Team Roster", value=roster, inline=True)
+                embed.add_field(name="Performance", value='**--- %.2f pts ---**' % (points / members), inline=True)
                 # Match History: `W 📈 +10 pts` -vs- `Team: Frostbite`\n`L 📉 -14 pts` -vs- `Team: Set in Stone`\n`W 📈 + 8 pts` -vs- `Team: Pinar`\n`W 📈 +24 pts` -vs- `Team: chip n dale`
-                embed.add_field(name='Match History (latest 5)', value='feature coming soon...', inline = True)
-                return await ctx.send(content='used Feature: NorthgardBattle `' + ctx.message.content + '`', embed=embed)
+                embed.add_field(name="Match History (latest 5)", value="feature coming soon...", inline=True)
+                return await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
             else:
-                await ctx.send("No team found with the name '%s'" % (name))
+                await ctx.send(f"Team '{name}' not found.")
 
 
 
@@ -94,7 +109,19 @@ class Team:
     async def list_teams(self, ctx, page: int = 1):
         """list all registered Teams"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            async with db.execute("SELECT team.TeamID, player.Points, team.Name, player.Name, player.Steam,  team.Registration, status.Value FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN role ON role.RoleID = teamplayer.RoleID LEFT JOIN player ON teamplayer.PlayerID = player.PlayerID LEFT JOIN status ON status.StatusID = team.StatusID WHERE role.RoleID == 2 OR role.RoleID IS NULL GROUP BY team.TeamID ORDER BY team.TeamID ASC LIMIT ?, 15;", ((page-1) * 15, )) as cursor:
+            async with db.execute("""
+                SELECT
+                    team.TeamID, player.Points, team.Name, player.Name, player.Steam,
+                    team.Registration, status.Value
+                FROM team
+                LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                LEFT JOIN role ON role.RoleID = teamplayer.RoleID
+                LEFT JOIN player ON teamplayer.PlayerID = player.PlayerID
+                LEFT JOIN status ON status.StatusID = team.StatusID
+                WHERE role.RoleID == 2 OR role.RoleID IS NULL
+                GROUP BY team.TeamID
+                ORDER BY team.TeamID ASC
+                LIMIT ?, 15;""", ((page-1) * 15,)) as cursor:
                 teamname = ""
                 leaders = ""
                 async for result in cursor:
@@ -105,22 +132,26 @@ class Team:
                         pts = result[1]
                     if result[3] is not None:
                         if result[4] is not None:
-                            leaders += "[%s](%s)" % (result[3], result[4])
+                            leaders += f"[{result[3]}]({result[4]})"
                         else:
                             leaders += result[3]
                     else:
                         leaders += "`no leader`"
                     leaders += "\n"
-                    teamname += "`#%s` %s \u200b \u200b \u200b\n" % (result[0], result[2])
+                    teamname += f"`#{result[0]}` {result[2]} \u200b \u200b \u200b\n"
         # generate embed
-        embed = discord.Embed(title='__Team List__',description='List of all registered teams in Northgard Battle\n \nPage: '+ str(page),colour=6809006, timestamp = datetime.now())
-        embed.set_footer(text='--- List: sorted by TeamID --- ||')
+        embed = discord.Embed(title="__Team List__",
+                              description=f"List of all registered teams in Northgard Battle\n \nPage: {page}",
+                              colour=6809006,
+                              timestamp = datetime.now())
+        embed.set_footer(text="--- List: sorted by TeamID --- ||")
         if not teamname:
-            embed.add_field(name='Team', value="no teams listed here.", inline = True)
+            embed.add_field(name="Team", value="no teams listed here.", inline=True)
         else:
-            embed.add_field(name='Team', value=teamname, inline = True)
-            embed.add_field(name='Leader', value=leaders, inline = True)
-        await ctx.send(content='used Feature: NorthgardBattle `' + ctx.message.content + '`', embed=embed)
+            embed.add_field(name="Team", value=teamname, inline=True)
+            embed.add_field(name="Leader", value=leaders, inline=True)
+        await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+
 
     # register_team(): async
     @team.command(name="register")
@@ -128,7 +159,11 @@ class Team:
         """register your Team profile"""
         name = name.strip()
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("SELECT player.PlayerID, player.StatusID, teamplayer.TeamID FROM player LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID WHERE Name = ?;", ( ctx.author.name, ))
+            cursor = await db.execute("""
+                SELECT player.PlayerID, player.StatusID, teamplayer.TeamID
+                FROM player
+                LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
+                WHERE Name = ?;""", ( ctx.author.name, ))
             player = await cursor.fetchone()
             await cursor.close()
             # check: is player registered?
@@ -137,45 +172,56 @@ class Team:
                 if player[2] == "None":
                     # check: is verified player?
                     if player[1] == 2:
-                        cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ?;", ( name, ))
+                        cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ?;", (name,))
                         team = await cursor.fetchone()
                         await cursor.close()
                         if team is None:
-                            await db.execute("INSERT INTO team (Name, Registration) VALUES (?, ?);", ( name, str(datetime.now()) ))
+                            await db.execute("""
+                                INSERT INTO team (Name, Registration)
+                                VALUES (?, ?);""", (name, str(datetime.now())))
                             await db.commit()
-                            await db.execute("INSERT INTO teamplayer (TeamID, PlayerID, RoleID) SELECT TeamID, ?, 2 FROM team WHERE name = ?;", ( player[0], name))
+                            await db.execute("""
+                                INSERT INTO teamplayer (TeamID, PlayerID, RoleID)
+                                SELECT TeamID, ?, 2
+                                FROM team
+                                WHERE name = ?;""", (player[0], name))
                             await db.commit()
-                            return await ctx.send("%s successfully registered the Team '%s'" % (ctx.author.mention, name))
+                            return await ctx.send(f"{ctx.author.mention} successfully registered the Team '{name}'")
                         else:
-                            return await ctx.send("Team '%s' is already registered, use a unique team name." % (name))
+                            return await ctx.send(f"Team '{name}' is already registered, use a unique team name.")
                     else:
-                        return await ctx.send("Your Player Profile '%s' isnt 'verified' yet." % (ctx.author.name))
+                        return await ctx.send(f"Your Player Profile '{ctx.author.name}' isnt 'verified' yet.")
                 else:
                     return await ctx.send("You are already part of a Team.")
             else:
-                await ctx.send("Only verfied players can register teams.\nUse: `!register` to create your player profile.\nAfter your Status became 'verified', try again.")
+                await ctx.send("""
+                    Only verfied players can register teams.\n
+                    Use: `!register` to create your player profile.\n
+                    After your Status became 'verified', try again.""")
 
 
     # add_team(): async
-    @team.command(name="add", hidden = True)
+    @team.command(name="add", hidden=True)
     @commands.is_owner()
     async def add_team(self, ctx, *, name: str):
         """add a Team"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("INSERT INTO team (Name, Registration, StatusID) VALUES (?, ?, 1);", ( name, str(datetime.now()) ))
+            await db.execute("""
+                INSERT INTO team (Name, Registration, StatusID)
+                VALUES (?, ?, 1);""", (name, str(datetime.now())))
             await db.commit()
-        await ctx.send("Team '%s' got sucessfully registered." % (name))
+        await ctx.send(f"Team '{name}' got sucessfully registered.")
 
 
     # verify_team(): async
-    @team.command(name="verify", hidden = True)
+    @team.command(name="verify", hidden=True)
     @commands.is_owner()
     async def verify_team(self, ctx, *, name: str):
         """verify a Team"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("UPDATE team SET StatusID = 2 WHERE name = ?;", ( name, ))
+            await db.execute("UPDATE team SET StatusID = 2 WHERE name = ?;", (name,))
             await db.commit()
-        await ctx.send("Team '%s' got verified." % (name))
+        await ctx.send(f"Team '{name}' got verified.")
 
 
     # invite_to_team(): async
@@ -184,12 +230,18 @@ class Team:
         """create an Invite Code for your Team"""
         dict = { "manager": 1, "member": 3, "substitute": 4 }
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("SELECT PlayerID FROM player WHERE StatusID = 2 AND Name = ?;", ( ctx.author.name, ))
+            cursor = await db.execute("""
+                SELECT PlayerID
+                FROM player
+                WHERE StatusID = 2 AND Name = ?;""", (ctx.author.name,))
             player = await cursor.fetchone()
             await cursor.close()
             # check: is player registered and verified?
             if player is not None:
-                cursor = await db.execute("SELECT RoleID FROM teamplayer WHERE RoleID = 2 AND PlayerID = ?;", ( player[0], ))
+                cursor = await db.execute("""
+                    SELECT RoleID
+                    FROM teamplayer
+                    WHERE RoleID = 2 AND PlayerID = ?;""", (player[0],))
                 leader = await cursor.fetchone()
                 await cursor.close()
                 # check: is player leader?
@@ -197,16 +249,28 @@ class Team:
                     if type.lower() in dict:
                         roleID = dict[type.lower()]
                         code = CodeGen.generate(CodeGen,3,4,1)
-                        await db.execute("INSERT INTO codes (TeamID, Value, RoleID, Date) SELECT team.teamID, ?, ?, datetime() FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID WHERE player.Name = ? AND teamplayer.RoleID = 2;", ( code[0], roleID, ctx.author.name ))
+                        await db.execute("""
+                            INSERT INTO codes (TeamID, Value, RoleID, Date)
+                            SELECT team.teamID, ?, ?, datetime()
+                            FROM team
+                            LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                            LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                            WHERE player.Name = ? AND teamplayer.RoleID = 2;""", (code[0], roleID, ctx.author.name))
                         await db.commit()
-                        embed = discord.Embed(title='Invite Code for __Team %s__' % (type.lower().capitalize()),description='%s\n```\n!team join %s\n```' % ((code[0], code[0])),colour=3158584)
-                        await ctx.send(content='used Feature: NorthgardBattle `' + ctx.message.content + '`', embed=embed)
+                        embed = discord.Embed(title=f"Invite Code for __Team {type.lower().capitalize()}__",
+                                              description=f"{code[0]}\n```\n!team join {code[0]}\n```",
+                                              colour=3158584)
+                        await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
                     else:
-                        return await ctx.send("%s is not a valid Team role, only `Manager`, `Member` and `Substitute` is allowed." % (type))
+                        return await ctx.send(
+                            f"{type} is not a valid Team role, only `Manager`, `Member` and `Substitute` is allowed.")
                 else:
                     return await ctx.send("You are not in a Team or not the Leader of the Team.")
             else:
-                await ctx.send("You dont have __verified__ registered player profile.\nUse: `!register` to register yourself.\nUse: `!me` to check your 'verified'-status.")
+                await ctx.send(
+                    """You dont have __verified__ registered player profile.\n
+                    Use: `!register` to register yourself.\n
+                    Use: `!me` to check your 'verified'-status.""")
 
 
     # join_team(): async
@@ -229,7 +293,11 @@ class Team:
                     # code valid! player registered?
                     if player is not None:
                         # check team member IDs based on TeamID from Code
-                        cursor = await db.execute("SELECT teamplayer.PlayerID FROM codes LEFT JOIN teamplayer ON teamplayer.TeamID = codes.TeamID WHERE codes.Value = ?", ( code, ))
+                        cursor = await db.execute("""
+                            SELECT teamplayer.PlayerID
+                            FROM codes
+                            LEFT JOIN teamplayer ON teamplayer.TeamID = codes.TeamID
+                            WHERE codes.Value = ?""", (code,))
                         team = await cursor.fetchall()
                         await cursor.close()
                         inteam = False
@@ -238,22 +306,33 @@ class Team:
                                 inteam = True
                         # code valid! player registered! player not in Team?
                         if not inteam:
-                            cursor = await db.execute("SELECT codes.TeamID, codes.RoleID, team.Name, role.Name FROM codes LEFT JOIN team ON team.TeamID = codes.TeamID LEFT JOIN role ON role.RoleID = codes.RoleID WHERE codes.Value =  ?", ( code, ))
+                            cursor = await db.execute("""
+                                SELECT codes.TeamID, codes.RoleID, team.Name, role.Name
+                                FROM codes
+                                LEFT JOIN team ON team.TeamID = codes.TeamID
+                                LEFT JOIN role ON role.RoleID = codes.RoleID
+                                WHERE codes.Value =  ?""", (code,))
                             result = await cursor.fetchone()
                             await cursor.close()
-                            await db.execute("INSERT INTO teamplayer (TeamID, PlayerID, RoleID) VALUES (?, ?, ?);", ( result[0], player[0], result[1] ))
-                            await db.execute("DELETE FROM codes WHERE CodeID = ?;", ( data[0], ))
+                            await db.execute("""
+                                INSERT INTO teamplayer (TeamID, PlayerID, RoleID)
+                                VALUES (?, ?, ?);""", (result[0], player[0], result[1]))
+                            await db.execute("DELETE FROM codes WHERE CodeID = ?;", (data[0],))
                             await db.commit()
-                            return await ctx.send("Code `%s` successfully redeemed...\n%s joined **%s** as a *%s*." % (code, ctx.author.mention, result[2], result[3]))
+                            return await ctx.send(
+                                f"""Code `{code}` successfully redeemed...\n
+                                {ctx.author.mention} joined **{result[2]}** as a *{result[3]}*.""")
                         # code valid! User in Team
                         else:
                             return await ctx.send("You are already in the Team.")
                     else:
-                        return await ctx.send("Only registered players can join teams.\nUse: `!register` to create your player profile.")
+                        return await ctx.send(
+                            """Only registered players can join teams.\n
+                            Use: `!register` to create your player profile.""")
                 else:
-                    return await ctx.send("Code `%s` is invalid." % (code))
+                    return await ctx.send(f"Code `{code}` is invalid.")
         else:
-            await ctx.send("Code `%s` is not a proper code (length: 14 characters)" % (code))
+            await ctx.send(f"Code `{code}` is not a proper code (length: 14 characters)")
 
 
     # claim_team(): async
@@ -261,42 +340,63 @@ class Team:
     async def claim_team(self, ctx, *, name: str):
         """claim your leaderless Team (become the Leader)"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("SELECT teamplayer.RoleID, player.Name, team.TeamID, player.PlayerID FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID WHERE team.Name = ?;", (name,))
+            cursor = await db.execute("""
+                SELECT teamplayer.RoleID, player.Name, team.TeamID, player.PlayerID
+                FROM team
+                LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                WHERE team.Name = ?;""", (name,))
             result = await cursor.fetchall()
             for item in result:
                 if ctx.author.name in item:
                     if item[0] != 2:
-                        await db.execute("UPDATE teamplayer SET RoleID = 2 WHERE TeamID = ? AND PlayerID = ?;", (item[2], item[3]))
+                        await db.execute("""
+                            UPDATE teamplayer
+                            SET RoleID = 2
+                            WHERE TeamID = ? AND PlayerID = ?;""", (item[2], item[3]))
                         await db.commit()
-                        return await ctx.send("%s became the **Team Leader** of '%s'." % (ctx.author.name, name))
+                        return await ctx.send(f"{ctx.author.name} became the **Team Leader** of '{name}'.")
 
 
     # assign_player(): async
-    @team.command(name="assign", hidden = True)
+    @team.command(name="assign", hidden=True)
     @commands.is_owner()
     async def assign_player(self, ctx, role: str, *, name: str):
         """assign a Team member to a role"""
         dict = { "manager": 1, "member": 3, "substitute": 4 }
         if role.lower() in dict:
             async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-                cursor = await db.execute("SELECT teamplayer.TeamID FROM teamplayer LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID WHERE teamplayer.RoleID = 2 AND player.Name = ?;", ( ctx.author.name, ))
+                cursor = await db.execute("""
+                    SELECT teamplayer.TeamID
+                    FROM teamplayer
+                    LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                    WHERE teamplayer.RoleID = 2 AND player.Name = ?;""", (ctx.author.name,))
                 teamID = await cursor.fetchone()
                 await cursor.close()
                 # check: leader?
                 if teamID is not None:
-                    cursor = await db.execute("SELECT teamplayer.TeamPlayerID FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID LEFT JOIN role ON role.RoleID = teamplayer.RoleID WHERE team.TeamID = ? AND player.Name = ?", ( teamID[0], name ))
+                    cursor = await db.execute("""
+                        SELECT teamplayer.TeamPlayerID
+                        FROM team
+                        LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                        LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                        LEFT JOIN role ON role.RoleID = teamplayer.RoleID
+                        WHERE team.TeamID = ? AND player.Name = ?""", (teamID[0], name))
                     result = await cursor.fetchone()
                     await cursor.close()
                     if result is not None:
-                        await db.execute("UPDATE teamplayer SET RoleID = ? WHERE TeamPlayerID = ?;", ( dict[role.lower()], result[0]))
+                        await db.execute("""
+                            UPDATE teamplayer
+                            SET RoleID = ?
+                            WHERE TeamPlayerID = ?;""", (dict[role.lower()], result[0]))
                         await db.commit()
-                        return await ctx.send("%s became **Team %s** of the team." % ( name, role.lower().capitalize() ))
+                        return await ctx.send(f"{name} became **Team {role.lower().capitalize()}** of the team.")
                     else:
-                        return await ctx.send("%s is not a part of the Team." % (name))
+                        return await ctx.send(f"{name} is not a part of the Team.")
                 else:
                     return await ctx.send("You are not a Team Leader.")
         else:
-            await ctx.send("%s is not a valid Team role, only `Manager`, `Member` and `Substitute` is allowed." % (role))
+            await ctx.send(f"{role} is not a valid Team role, only `Manager`, `Member` and `Substitute` is allowed.")
 
 
     # set_teamdata(): async
@@ -307,12 +407,36 @@ class Team:
         if subject.lower() in args:
             async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
                 if subject.lower() == "description":
-                    await db.execute("UPDATE team SET Description = ? WHERE team.TeamID = (SELECT team.TeamID FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID WHERE player.Name = ? AND teamplayer.RoleID = 2);", (data, ctx.author.name))
+                    await db.execute("""
+                        UPDATE team
+                        SET Description = ?
+                        WHERE team.TeamID =
+                            (SELECT team.TeamID
+                             FROM team
+                             LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                             LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                             WHERE player.Name = ? AND teamplayer.RoleID = 2);""", (data, ctx.author.name))
                 if subject.lower() == "name":
-                    await db.execute("UPDATE team SET Name = ? WHERE team.TeamID = (SELECT team.TeamID FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID WHERE player.Name = ? AND teamplayer.RoleID = 2);", (data, ctx.author.name))
-                    await db.execute("UPDATE team SET StatusID = 1 WHERE team.TeamID = (SELECT team.TeamID FROM team LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID WHERE player.Name = ? AND teamplayer.RoleID = 2);", (ctx.author.name,))
+                    await db.execute("""
+                        UPDATE team
+                        SET Name = ?
+                        WHERE team.TeamID =
+                            (SELECT team.TeamID
+                             FROM team
+                             LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                             LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                             WHERE player.Name = ? AND teamplayer.RoleID = 2);""", (data, ctx.author.name))
+                    await db.execute("""
+                        UPDATE team
+                        SET StatusID = 1
+                        WHERE team.TeamID =
+                            (SELECT team.TeamID
+                             FROM team
+                             LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                             LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                             WHERE player.Name = ? AND teamplayer.RoleID = 2);""", (ctx.author.name,))
                 await db.commit()
-            await ctx.send("Your Team-Data '%s' got set to `%s`" % (subject, data))
+            await ctx.send(f"Your Team-Data '{subject}' got set to `{data}`")
 
 
     # leave_team(): async
@@ -320,18 +444,26 @@ class Team:
     async def leave_team(self, ctx):
         """leave your Team"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("DELETE FROM teamplayer WHERE teamplayer.PlayerID = (SELECT player.PlayerID FROM player WHERE player.Name = ?);", (ctx.author.name,))
+            await db.execute("""
+                DELETE FROM teamplayer
+                WHERE teamplayer.PlayerID =
+                    (SELECT player.PlayerID
+                     FROM player
+                     WHERE player.Name = ?);""", (ctx.author.name,))
             await db.commit()
         await ctx.send("You have successfully left the team.")
 
 
     # disband_team(): async
-    @team.command(name="disband", hidden = True)
+    @team.command(name="disband", hidden=True)
     @commands.guild_only()
     async def disband_team(self, ctx):
         """disband the Team"""
         #TO-DO: check for invoker in a team
-        await ctx.send("Are you sure, you want to disband your Team?\nThis action cannot be reverted.\nType `disband` to confirm...")
+        await ctx.send(
+            """Are you sure, you want to disband your Team?\n
+            This action cannot be reverted.\n
+            Type `disband` to confirm...""")
 
         def check(msg):
             return msg.content == 'disband' and msg.channel == ctx.channel
@@ -346,16 +478,16 @@ class Team:
 
 
     # delete_team(): async
-    @team.command(name="delete", hidden = True)
+    @team.command(name="delete", hidden=True)
     @commands.is_owner()
     async def delete_team(self, ctx, *, name: str):
         """delete a Team"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ?;", (name, ))
+            cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ?;", (name,))
             team = await cursor.fetchone()
             await cursor.close()
             if team is not None:
-                await db.execute("DELETE FROM team WHERE TeamID = ?;", ( team[0], ))
+                await db.execute("DELETE FROM team WHERE TeamID = ?;", (team[0],))
                 await db.commit()
                 return await ctx.send(f"Team {name} got successfully deleted.")
             else:
@@ -363,7 +495,7 @@ class Team:
 
 
     # [DEV] dummy(): async
-    @team.command(name="dummy", hidden = True)
+    @team.command(name="dummy", hidden=True)
     async def dummy_team(self, ctx):
         """[DEV] Team Dummy"""
         embed = discord.Embed(title='__Blood Eagle Selfie__',description='bla bla bla, custom description, bla bla blubb, bla bla bla, custom description, bla bla blubb, bla bla bla, custom description, bla bla blubb, bla bla bla, custom description, bla bla blubb!',colour=6809006)
