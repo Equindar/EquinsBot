@@ -163,7 +163,7 @@ class Team:
                 SELECT player.PlayerID, player.StatusID, teamplayer.TeamID
                 FROM player
                 LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
-                WHERE Name = ?;""", ( ctx.author.name, ))
+                WHERE player.Name = ?;""", ( ctx.author.name, ))
             player = await cursor.fetchone()
             await cursor.close()
             # check: is player registered?
@@ -184,7 +184,7 @@ class Team:
                                 INSERT INTO teamplayer (TeamID, PlayerID, RoleID)
                                 SELECT TeamID, ?, 2
                                 FROM team
-                                WHERE name = ?;""", (player[0], name))
+                                WHERE Name = ?;""", (player[0], name))
                             await db.commit()
                             return await ctx.send(f"{ctx.author.mention} successfully registered the Team '{name}'")
                         else:
@@ -219,7 +219,7 @@ class Team:
     async def verify_team(self, ctx, *, name: str):
         """verify a Team"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("UPDATE team SET StatusID = 2 WHERE name = ?;", (name,))
+            await db.execute("UPDATE team SET StatusID = 2 WHERE Name = ?;", (name,))
             await db.commit()
         await ctx.send(f"Team '{name}' got verified.")
 
@@ -268,9 +268,9 @@ class Team:
                     return await ctx.send("You are not in a Team or not the Leader of the Team.")
             else:
                 await ctx.send(
-                    """You dont have __verified__ registered player profile.\n
+                    """You dont have a __verified__, registered Player profile.\n
                     Use: `!register` to register yourself.\n
-                    Use: `!me` to check your 'verified'-status.""")
+                    Use: `!me` to check your 'verified'-Status.""")
 
 
     # join_team(): async
@@ -359,8 +359,7 @@ class Team:
 
 
     # assign_player(): async
-    @team.command(name="assign", hidden=True)
-    @commands.is_owner()
+    @team.command(name="assign")
     async def assign_player(self, ctx, role: str, *, name: str):
         """assign a Team member to a role"""
         dict = { "manager": 1, "member": 3, "substitute": 4 }
@@ -460,21 +459,35 @@ class Team:
     async def disband_team(self, ctx):
         """disband the Team"""
         #TO-DO: check for invoker in a team
-        await ctx.send(
-            """Are you sure, you want to disband your Team?\n
-            This action cannot be reverted.\n
-            Type `disband` to confirm...""")
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            cursor = await db.execute("""
+                SELECT team.teamID
+                FROM team
+                LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                WHERE player.Name = ? AND teamplayer.RoleID = 2;""", (ctx.author.name,))
+            team = await cursor.fetchone()
+            await cursor.close()
+            if team is not None:
+                await ctx.send(
+                    """Are you sure, you want to disband your Team?\n
+                    This action cannot be reverted.\n
+                    Type `disband` to confirm...""")
 
-        def check(msg):
-            return msg.content == 'disband' and msg.channel == ctx.channel
+                def check(msg):
+                    return msg.content == 'disband' and msg.channel == ctx.channel
 
-        try:
-            reply = await self.bot.wait_for('message', check=check, timeout=10.0)
-        except asyncio.TimeoutError:
-            await ctx.send("Your Team-Disband request (10sec) timed out. Retry...")
-        else:
-            # TO-DO: database operations
-            await ctx.send("You successfully disbanded your Team")
+                try:
+                    reply = await self.bot.wait_for('message', check=check, timeout=10.0)
+                except asyncio.TimeoutError:
+                    await ctx.send("Your Team-Disband request (10sec) timed out. Retry...")
+                else:
+                    await db.execute("DELETE FROM teamplayer WHERE teamID = ? ;", (team[0],))
+                    await db.execute("DELETE FROM team WHERE teamID = ? ;", (team[0],))
+                    await db.commit()
+                    return await ctx.send("You successfully disbanded your Team")
+            else:
+                await ctx.send("You are not in a Team.")
 
 
     # delete_team(): async

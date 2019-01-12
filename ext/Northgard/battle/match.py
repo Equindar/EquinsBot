@@ -16,14 +16,14 @@ class Match:
     async def match(self, ctx):
         """Manage the Match"""
         if ctx.invoked_subcommand is None:
-            await ctx.send('no param...')
+            await ctx.send("No param...")
 
     # show_match(): async
     @match.command(name="show")
     async def show_match(self, ctx):
         """Display a Match"""
         print("Here: !match show")
-        print("%s: %s" % (ctx.command.cog_name, ctx.command.name))
+        await ctx.send(f"{ctx.command.cog_name}: {ctx.command.name}")
 
     # add_match(): async
     @match.command(name="add")
