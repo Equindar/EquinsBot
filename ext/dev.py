@@ -117,9 +117,11 @@ class DEV:
     async def test(self, ctx):
         """DEV function !test for testing"""
 
-        for member in ctx.guild.members:
-            if member.bot:
-                return await ctx.send(f"Found a freaking Bot: called {member.name}")
+        await ctx.send(ctx.channel.id)
+
+#        for member in ctx.guild.members:
+#            if member.bot:
+#                return await ctx.send(f"Found a freaking Bot: called {member.name}")
 #        overwrites = {
 #            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
 #            ctx.guild.me: discord.PermissionOverwrite(read_messages=True)

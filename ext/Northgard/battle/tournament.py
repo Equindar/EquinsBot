@@ -44,7 +44,6 @@ class Tournament:
 
     # join_tournament(): async
     @tournament.command(name="join", hidden=True)
-    @commands.is_owner()
     async def join_tournament(self, ctx):
         """join an active Tournament"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
@@ -80,27 +79,46 @@ class Tournament:
                     except asyncio.TimeoutError:
                         await ctx.send("Your Tournament-Join request (20sec) timed out. Retry...")
                     else:
-                        cursor = await db.execute("""
+                        async with db.execute("""
                             SELECT Count(participant.ParticipantID), team.TeamID
                             FROM participant
                             LEFT JOIN team ON team.TeamID = participant.TeamID
-                            WHERE TournamentID = ?""", (dict[reply.content],))
-                        participants = await cursor.fetchall()
-                        await cursor.close()
-                        print(participants)
-                        if participants[0][0] < tournament[0][2]:
+                            WHERE TournamentID = ?""", (dict[reply.content],)) as cursor:
+                            counter = 0
+                            async for result in cursor:
+                                if result[1] == team[0]:
+                                    return await ctx.send(f"Your Team '{team[1]}' already joined '{reply.content}'")
+                                counter += 1
+                        if counter < tournament[0][2]:
                             # push to Participant
-                            print("participant")
-                            pass
+                            await db.execute("""
+                                INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
+                                VALUES (1, ?, ?, ?)""", (dict[reply.content], team[0], counter))
+                            await db.commit()
+                            await self.team_joined(ctx, counter, team[0])
+                            return await ctx.send(f"Your Team '{team[1]}' **successfully joined** '{reply.content}'")
                         else:
                             # push to BackupQueue
-                            print("backup queue")
-                            pass
+                            await db.execute("""
+                                INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
+                                VALUES (2, ?, ?, ?)""", (dict[reply.content], team[0], counter))
+                            await db.commit()
+                            return await ctx.send(
+                                f"""Your Team '{team[1]}' **successfully joined** '{tournament[1]}'
+                                \nYou entered the BackupQueue at Position #{(counter)-tournament[2]}""")
                 else:
                     await ctx.send("""You **cannot join** a tournament.\n
                         \n__Reasons can be:__\nYou are not in a Team.\nYou are not the Team Leader.""")
             else:
                 return await ctx.send("No active (joinable) Tournament found.")
+
+
+    async def team_joined(self, ctx, pos: int, team_id: int):
+        """DISCORD WORKFLOW"""
+        await ctx.send(f"Position: {pos}, TeamID: {team_id}")
+
+
+
 
 
     # set_date(): async
