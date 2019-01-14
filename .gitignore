@@ -1,6 +1,8 @@
 
 # --- Equindar Custom ---
 cfg/identity.py
+ext/Northgard/battle/data/battle-db.sqlite
+
 
 
 # --- Byte-compiled / optimized / DLL files ---
