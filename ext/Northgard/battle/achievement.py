@@ -75,9 +75,23 @@ class Achievements:
                 player = await cursor.fetchone()
                 await cursor.close()
                 if player is not None:
-                    await db.execute("""
-                        INSERT INTO playerachievements (PlayerID, AchievementID)
-                        VALUES (?,?)""", (player[0], achievement[0]))
+                    cursor = await db.execute("""
+                        SELECT playerachievements.Value
+                        FROM playerachievements
+                        LEFT JOIN player ON player.PlayerID = playerachievements.PlayerID
+                        WHERE player.PlayerID = ? AND playerachievements.AchievementID = ?;""", (player[0],achievement[0]))
+                    result = await cursor.fetchone()
+                    await cursor.close()
+                    # Achievement already exists?
+                    if result is not None:
+                        await db.execute("""
+                            UPDATE playerachievements
+                            SET Value = ?
+                            WHERE PlayerID = ? AND AchievementID = ?;""", (result[0] + 1,player[0],achievement[0]))
+                    else:
+                        await db.execute("""
+                            INSERT INTO playerachievements (PlayerID, AchievementID)
+                            VALUES (?,?)""", (player[0], achievement[0]))
                     await db.commit()
                     await ctx.send(f"Achievement '{achievement[1]}' got sucessfully assigned to Player '{target}'.")
                     await self.bot.get_guild(self.bot.northgardbattle).get_member(player[1]).send(
