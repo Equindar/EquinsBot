@@ -1,6 +1,7 @@
 # --- imports
 import discord
 import time
+import aiosqlite
 from datetime import datetime, timedelta
 from discord.ext import commands
 
@@ -28,10 +29,127 @@ class Tournament:
             await ctx.send("No param...")
 
 
-    # create_tournament(): async
-    @tournament.command(name="create")
+    # add_tournament(): async
+    @tournament.command(name="add", hidden=True)
     @commands.is_owner()
-    async def create_tournament(self, ctx, *, name: str = "Untitled Tournament"):
+    async def add_tournament(self, ctx, *, name: str):
+        """add a Tournament"""
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            await db.execute("""
+                INSERT INTO tournament (Name, CreationDate)
+                VALUES (?, ?);""", (name, str(datetime.now())))
+            await db.commit()
+        await ctx.send(f"Tournament '{name}' got **sucessfully added**.")
+
+
+    # join_tournament(): async
+    @tournament.command(name="join", hidden=True)
+    @commands.is_owner()
+    async def join_tournament(self, ctx):
+        """join an active Tournament"""
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            # check: list active tournament
+            cursor = await db.execute("""
+                SELECT TournamentID, Name, TeamLimit
+                FROM tournament
+                WHERE StatusID = 3""")
+            tournament = await cursor.fetchall()
+            await cursor.close()
+            if tournament is not None:
+                # list tournaments
+                output = ""
+                dict = {}
+                for item in tournament:
+                    output += f"Type in: `{item[1]}` to join...\n"
+                    dict[item[1]] = item[0]
+                cursor = await db.execute("""
+                    SELECT team.TeamID, team.Name
+                    FROM team
+                    LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                    LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                    WHERE teamplayer.RoleID = 2 AND player.Name = ?""", (ctx.author.name,))
+                team = await cursor.fetchone()
+                await cursor.close()
+                # check: in Team and Team Leader?
+                if team is not None:
+                    await ctx.send(f"Are you sure, you want to join an active Tournament?\n{output}")
+                    def check(msg):
+                        return msg.content in dict and msg.channel == ctx.channel
+                    try:
+                        reply = await self.bot.wait_for('message', check=check, timeout=20.0)
+                    except asyncio.TimeoutError:
+                        await ctx.send("Your Tournament-Join request (20sec) timed out. Retry...")
+                    else:
+                        cursor = await db.execute("""
+                            SELECT Count(participant.ParticipantID), team.TeamID
+                            FROM participant
+                            LEFT JOIN team ON team.TeamID = participant.TeamID
+                            WHERE TournamentID = ?""", (dict[reply.content],))
+                        participants = await cursor.fetchall()
+                        await cursor.close()
+                        print(participants)
+                        if participants[0][0] < tournament[0][2]:
+                            # push to Participant
+                            print("participant")
+                            pass
+                        else:
+                            # push to BackupQueue
+                            print("backup queue")
+                            pass
+                else:
+                    await ctx.send("""You **cannot join** a tournament.\n
+                        \n__Reasons can be:__\nYou are not in a Team.\nYou are not the Team Leader.""")
+            else:
+                return await ctx.send("No active (joinable) Tournament found.")
+
+
+    # set_date(): async
+    @tournament.command(name="date")
+    @commands.is_owner()
+    async def set_date(self, date: datetime):
+        self.date = date
+        print(type(self.date))
+        print(self.date)
+
+
+    # deadline(): async
+    @commands.command()
+    async def deadline(self, ctx):
+        """[DEV] Deadline Display"""
+        emoji = {
+            0:':zero:', 1:':one:', 2:':two:', 3:':three:', 4:':four:',
+            5:":five:", 6:":six:", 7:":seven:", 8:":eight:", 9:":nine:"
+        }
+        now = datetime.now()
+        date = datetime(2019,1,26,12,0,0)
+        # create dict
+        td = date - now
+        if td.total_seconds() < 0:
+            return
+        d = {"D": td.days }
+        d["H"], rem = divmod(td.seconds, 3600)
+        d["M"], d["S"] = divmod(rem, 60)
+        # get string / + zfill()
+        s = ""
+        for key, value in d.items():
+            s += str(value).zfill(2) + " **:** "
+        # replace with dict
+        x = ""
+        for c in s[:-7]:
+            if(c.isdigit()):
+                x += emoji[int(c)]
+            else:
+                x += c
+        embed = discord.Embed(colour=6809006, timestamp = date - timedelta(hours=1))
+        embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
+                        value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
+        await ctx.send(content='used Feature: Deadline `!deadline`', embed=embed)
+
+
+    # setup_tournament(): async
+    @tournament.command(name="setup")
+    @commands.is_owner()
+    async def setup_tournament(self, ctx, *, name: str = "Untitled Tournament"):
         """create a new Tournament"""
         ow_category = {
             ctx.guild.get_role(self.participant): discord.PermissionOverwrite(read_messages=True),
@@ -60,50 +178,6 @@ class Tournament:
         # set channel perms
         await ch_info.set_permissions(ow_info)
         await ctx.send("Tournament got set up.")
-
-
-    # set_date(): async
-    @tournament.command(name="date")
-    @commands.is_owner()
-    async def set_date(self, date: datetime):
-        self.date = date
-        print(type(self.date))
-        print(self.date)
-
-
-    # deadline(): async
-    @commands.command()
-    @commands.guild_only()
-    async def deadline(self, ctx):
-        """[DEV] Deadline Display"""
-        emoji = {
-            0:':zero:', 1:':one:', 2:':two:', 3:':three:', 4:':four:',
-            5:":five:", 6:":six:", 7:":seven:", 8:":eight:", 9:":nine:"
-        }
-
-        now = datetime.now()
-        date = datetime(2018,12,15,12,0,0)
-        # create dict
-        td = date - now
-        if td.total_seconds() < 0:
-            return
-        d = {"D": td.days }
-        d["H"], rem = divmod(td.seconds, 3600)
-        d["M"], d["S"] = divmod(rem, 60)
-        # get string / + zfill()
-        s = ""
-        for key, value in d.items():
-            s += str(value).zfill(2) + " **:** "
-        # replace with dict
-        x = ""
-        for c in s[:-7]:
-            if(c.isdigit()):
-                x += emoji[int(c)]
-            else:
-                x += c
-        embed = discord.Embed(colour=6809006, timestamp = date - timedelta(hours=1))
-        embed.add_field(name='aXe-Mas Tournament starting in...', value=':stopwatch: ' + x)
-        await ctx.send(content='used Feature: Deadline `!deadline`', embed=embed)
 
 
 # --- routine: setup/assign cog
