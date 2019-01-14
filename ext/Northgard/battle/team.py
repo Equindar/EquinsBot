@@ -210,7 +210,7 @@ class Team:
                 INSERT INTO team (Name, Registration, StatusID)
                 VALUES (?, ?, 1);""", (name, str(datetime.now())))
             await db.commit()
-        await ctx.send(f"Team '{name}' got sucessfully registered.")
+        await ctx.send(f"Team '{name}' got **sucessfully added**.")
 
 
     # verify_team(): async
@@ -219,9 +219,37 @@ class Team:
     async def verify_team(self, ctx, *, name: str):
         """verify a Team"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("UPDATE team SET StatusID = 2 WHERE Name = ?;", (name,))
-            await db.commit()
-        await ctx.send(f"Team '{name}' got verified.")
+            cursor = await db.execute("""
+                SELECT TeamID, StatusID
+                FROM team
+                WHERE team.Name = ?""", (name,))
+            team = await cursor.fetchone()
+            await cursor.close()
+            if team is not None:
+                if team[1] != 2:
+                    cursor = await db.execute("""
+                        SELECT player.Name, status.Value
+                        FROM player
+                        LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
+                        LEFT JOIN team ON team.TeamID = teamplayer.TeamID
+                        LEFT JOIN status ON status.StatusID = player.StatusID
+                        WHERE team.teamID = ?;""", (team[0],))
+                    players = await cursor.fetchall()
+                    await cursor.close()
+                    issues = { }
+                    for item in players:
+                        if item[1] != "verified":
+                            issues[item[0]] = item[1]
+                    if not issues:
+                        await db.execute("UPDATE team SET StatusID = 2 WHERE TeamID = ?;", (team[0],))
+                        await db.commit()
+                        await ctx.send(f"Team '{name}' got **verified**.")
+                    else:
+                        await ctx.send(f"Team '{name}' cannot be verified.\nPlayer Status: `{str(issues)}`")
+                else:
+                    await ctx.send(f"Team '{name}' is already **verified**.")
+            else:
+                await ctx.send(f"Team '{name}' not found.")
 
 
     # invite_to_team(): async
