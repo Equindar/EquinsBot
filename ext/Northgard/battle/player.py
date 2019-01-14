@@ -60,8 +60,9 @@ class Player:
         """display a Player profile"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
             cursor = await db.execute("""
-                SELECT player.PlayerID, player.Name, player.Steam, player.Points, player.Description,
-                       player.Registration, status.Value, team.Name, discord.InternalID, achievements.AchievementID
+                SELECT player.PlayerID, player.Name, player.Steam, player.Points,
+                       player.Description, player.Registration, status.Value, team.Name,
+                       discord.InternalID, achievements.AchievementID
                 FROM player
                 LEFT JOIN status ON status.StatusID = player.StatusID
                 LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
@@ -76,7 +77,7 @@ class Player:
             if result is not None and result[9] is not None:
                 achievement = ""
                 cursor = await db.execute("""
-                    SELECT achievements.Icon, achievements.Name
+                    SELECT achievements.Icon, achievements.Name, playerachievements.Value
                     FROM player
                     LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID
                     LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID
@@ -84,7 +85,10 @@ class Player:
                 achievements = await cursor.fetchall()
                 await cursor.close()
                 for item in achievements:
-                    achievement += f"`{item[0]}` {item[1]}\n"
+                    if item[2] > 1:
+                        achievement += f"`{item[0]}` {item[2]}x {item[1]}\n"
+                    else:
+                        achievement += f"`{item[0]}` {item[1]}\n"
             else:
                 achievement = "no achievements yet"
         # TO-DO
@@ -106,7 +110,7 @@ class Player:
             embed.set_thumbnail(url = self.bot.get_guild(self.bot.northgardbattle).get_member(result[8]).avatar_url_as(format='png', size=512))
             embed.set_footer(text=f"--- Player-ID: #{result[0]} --- || --- Registered: {result[5][:-7]} --- || --- Status: {result[6]} ---")
             embed.add_field(name="Team", value=team, inline=True)
-            embed.add_field(name="Performance", value=f"**--- {result[3] pts ---**", inline=True)
+            embed.add_field(name="Performance", value=f"**--- {result[3]} pts ---**", inline=True)
             embed.add_field(name="Achievements", value=achievement, inline=True)
             await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
         else:
