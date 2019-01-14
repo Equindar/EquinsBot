@@ -25,15 +25,23 @@ class Player:
     async def register(self, ctx):
         """register your Player profile"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("SELECT PlayerID FROM player WHERE Name = ?;", ( ctx.author.name, ))
+            cursor = await db.execute("SELECT PlayerID FROM player WHERE Name = ?;", (ctx.author.name,))
             player = await cursor.fetchone()
             await cursor.close()
             if player is None:
-                await db.execute("INSERT INTO player (Name, Registration) VALUES (?, ?);", ( ctx.author.name, str(datetime.now()) ))
+                await db.execute("""
+                    INSERT INTO player (Name, Registration)
+                    VALUES (?, ?);""", (ctx.author.name, str(datetime.now())))
                 await db.commit()
-                await db.execute("UPDATE discord SET InternalID = ? WHERE ReferenceID = (SELECT PlayerID FROM player WHERE Name = ?);", ( str(ctx.author.id), ctx.author.name ))
+                await db.execute("""
+                    UPDATE discord
+                    SET InternalID = ?
+                    WHERE ReferenceID =
+                        (SELECT PlayerID
+                         FROM player
+                         WHERE Name = ?);""", (str(ctx.author.id), ctx.author.name))
                 await db.commit()
-                return await ctx.send("%s got sucessfully registered. Welcome!" % (ctx.author.mention))
+                return await ctx.send(f"{ctx.author.mention} got sucessfully registered. Welcome!")
             else:
                 await ctx.send("You are already registered. Use `!me` to check your profile")
 
@@ -51,17 +59,32 @@ class Player:
     async def show_player(self, ctx, *, name: str):
         """display a Player profile"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("SELECT player.PlayerID, player.Name, player.Steam, player.Points, player.Description, player.Registration, status.Value, team.Name, discord.InternalID, achievements.AchievementID FROM player LEFT JOIN status ON status.StatusID = player.StatusID LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID LEFT JOIN team ON team.TeamID = teamplayer.TeamID LEFT JOIN discord ON discord.ReferenceID = player.PlayerID LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID WHERE player.Name = ? AND discord.Reference = 'Player';", (name,))
+            cursor = await db.execute("""
+                SELECT player.PlayerID, player.Name, player.Steam, player.Points, player.Description,
+                       player.Registration, status.Value, team.Name, discord.InternalID, achievements.AchievementID
+                FROM player
+                LEFT JOIN status ON status.StatusID = player.StatusID
+                LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
+                LEFT JOIN team ON team.TeamID = teamplayer.TeamID
+                LEFT JOIN discord ON discord.ReferenceID = player.PlayerID
+                LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID
+                LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID
+                WHERE player.Name = ? AND discord.Reference = 'Player';""", (name,))
             result = await cursor.fetchone()
             await cursor.close()
             # load achievements
             if result is not None and result[9] is not None:
                 achievement = ""
-                cursor = await db.execute("SELECT achievements.Icon, achievements.Name FROM player LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID WHERE player.PlayerID = ?;", (result[0], ))
+                cursor = await db.execute("""
+                    SELECT achievements.Icon, achievements.Name
+                    FROM player
+                    LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID
+                    LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID
+                    WHERE player.PlayerID = ?;""", (result[0],))
                 achievements = await cursor.fetchall()
                 await cursor.close()
                 for item in achievements:
-                    achievement += "`%s` %s\n" % (item[0], item[1])
+                    achievement += f"`{item[0]}` {item[1]}\n"
             else:
                 achievement = "no achievements yet"
         # TO-DO
@@ -79,16 +102,15 @@ class Player:
                 steam = ""
             else:
                 steam = result[2]
-            embed = discord.Embed(title='__'+ result[1]+'__',description=desc,colour=6809006,url=steam)
+            embed = discord.Embed(title=f"__{result[1]}__",description=desc,colour=6809006,url=steam)
             embed.set_thumbnail(url = self.bot.get_guild(self.bot.northgardbattle).get_member(result[8]).avatar_url_as(format='png', size=512))
-            embed.set_footer(text='--- Player-ID: #'+ str(result[0])+' --- || --- Registered: '+ result[5][:-7] +' --- || --- Status: '+ result[6]+' ---')
-            embed.add_field(name='Team', value=team, inline = True)
-            embed.add_field(name='Performance', value='**--- '+ str(result[3]) +' pts ---**', inline = True)
-            # Achievements: 🥇 `1st Place: aXe-Mas 2018 Tournament`
-            embed.add_field(name='Achievements', value=achievement, inline = True)
-            await ctx.send(content='used Feature: NorthgardBattle `' + ctx.message.content + '`', embed=embed)
+            embed.set_footer(text=f"--- Player-ID: #{result[0]} --- || --- Registered: {result[5][:-7]} --- || --- Status: {result[6]} ---")
+            embed.add_field(name="Team", value=team, inline=True)
+            embed.add_field(name="Performance", value=f"**--- {result[3] pts ---**", inline=True)
+            embed.add_field(name="Achievements", value=achievement, inline=True)
+            await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
         else:
-            await ctx.send("No Player found with the name '%s'" % (name))
+            await ctx.send(f"Player not found: '{name}'")
 
 
     # list_players(): async
@@ -96,25 +118,32 @@ class Player:
     async def list_players(self, ctx, page: int = 1):
         """list all registered Players"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            async with db.execute("SELECT p.PlayerID, p.Name, p.Points, s.Value, p.Registration FROM player p LEFT JOIN status s on s.StatusID = p.StatusID ORDER BY p.PlayerID LIMIT ?, 15;", ((page-1) * 15, )) as cursor:
+            async with db.execute("""
+                SELECT p.PlayerID, p.Name, p.Points, s.Value, p.Registration
+                FROM player p
+                LEFT JOIN status s on s.StatusID = p.StatusID
+                ORDER BY p.PlayerID LIMIT ?, 15;""", ((page-1) * 15, )) as cursor:
                 players = ""
                 points = ""
                 stati = ""
                 async for result in cursor:
                     # data manipulation: db result (tuple)
-                    players += "`#%s` %s \u200b \u200b \u200b\n" % (str(result[0]), result[1])
-                    points += "%s pts \u200b \n" % (str(result[2]))
-                    stati += "%s\n" % (result[3])
+                    players += f"`#{result[0]}` {result[1]} \u200b \u200b \u200b\n"
+                    points += f"{result[2]} pts \u200b \n"
+                    stati += f"{result[3]}\n"
         # generate embed
-        embed = discord.Embed(title='__Player List__',description='List of all registered players in Northgard Battle\n \nPage: '+ str(page),colour=6809006, timestamp = datetime.now())
-        embed.set_footer(text='--- List: sorted by PlayerID --- ||')
+        embed = discord.Embed(title="__Player List__",
+                              description=f"List of all registered players in Northgard Battle\n \nPage: {page}",
+                              colour=6809006,
+                              timestamp = datetime.now())
+        embed.set_footer(text="--- List: sorted by PlayerID --- ||")
         if not players:
-            embed.add_field(name='Player', value="no players listed here.", inline = True)
+            embed.add_field(name="Player", value="no players listed here.", inline=True)
         else:
-            embed.add_field(name='Player', value=players, inline = True)
-            embed.add_field(name='Points', value=points, inline = True)
-            embed.add_field(name='Status', value=stati, inline = True)
-        await ctx.send(content='used Feature: NorthgardBattle `' + ctx.message.content + '`', embed=embed)
+            embed.add_field(name="Player", value=players, inline=True)
+            embed.add_field(name="Points", value=points, inline=True)
+            embed.add_field(name="Status", value=stati, inline=True)
+        await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
 
 
     # add_player(): async
@@ -124,28 +153,57 @@ class Player:
     async def add_player(self, ctx, *, name: str):
         """add a Player"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("INSERT INTO player (Name, Registration, StatusID) VALUES (?, ?, 1);", ( name, str(datetime.now()) ))
+            await db.execute("""
+                INSERT INTO player (Name, Registration, StatusID)
+                VALUES (?, ?, 1);""", (name, str(datetime.now())))
             await db.commit()
-        await ctx.send("Player '%s' got sucessfully added." % (name))
+        await ctx.send(f"Player '{name}' got sucessfully added.")
 
 
     # verify_player(): async
-    @player.command(name="verify", hidden = True)
+    @player.command(name="verify", hidden=True)
     @commands.is_owner()
     async def verify_player(self, ctx, *, name: str):
         """verify a Player"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("UPDATE player SET StatusID = 2 WHERE name = ?;", ( name, ))
+            await db.execute("UPDATE player SET StatusID = 2 WHERE name = ?;", (name,))
             await db.commit()
-        await ctx.send("Player '%s' got verified." % (name))
+        await ctx.send(f"Player '{name}' got verified.")
 
 
     # delete_player(): async
     @player.command(name="delete")
     async def delete_player(self, ctx):
         """delete the Player"""
-        print("Here: !player delete")
-        print(self.bot.northgardbattle)
+        #TO-DO: check for invoker in a team
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            cursor = await db.execute("""
+                SELECT PlayerID
+                FROM player
+                WHERE Name = ?;""", (ctx.author.name,))
+            player = await cursor.fetchone()
+            await cursor.close()
+            if player is not None:
+                await ctx.send(
+                    """Are you sure, you want to delete your Player profile?\n
+                    This action cannot be reverted.\n
+                    Type `delete` to confirm...""")
+
+                def check(msg):
+                    return msg.content == 'delete' and msg.channel == ctx.channel
+
+                try:
+                    reply = await self.bot.wait_for('message', check=check, timeout=10.0)
+                except asyncio.TimeoutError:
+                    await ctx.send("Your Player-Delete request (10sec) timed out. Retry...")
+                else:
+                    await db.execute("DELETE FROM playerachievements WHERE PlayerID = ? ;", (player[0],))
+                    await db.execute("DELETE FROM teamplayer WHERE PlayerID = ? ;", (player[0],))
+                    await db.execute("DELETE FROM player WHERE PlayerID = ? ;", (player[0],))
+                    await db.commit()
+                    return await ctx.send("You successfully deleted your Player profile.")
+            else:
+                await ctx.send("You dont have a registered Player profile.")
 
 
     # edit_player(): async
@@ -157,11 +215,11 @@ class Player:
             async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
                 if subject.lower() == "steam":
                     if data.startswith("https://steamcommunity.com/"):
-                        await db.execute("UPDATE player SET Steam = ? WHERE Name = ?;", ( data, ctx.author.name ))
+                        await db.execute("UPDATE player SET Steam = ? WHERE Name = ?;", (data,ctx.author.name))
                 elif subject.lower() == "description":
-                    await db.execute('UPDATE player SET Description = ? WHERE Name = ?;', (data, ctx.author.name))
+                    await db.execute('UPDATE player SET Description = ? WHERE Name = ?;', (data,ctx.author.name))
                 await db.commit()
-            await ctx.send("Your Player-Data '%s' got set to `%s`" % (subject, data))
+            await ctx.send(f"Your Player-Data '{subject}' got set to `{data}`")
 
 
     # [DEV] dummy(): async
