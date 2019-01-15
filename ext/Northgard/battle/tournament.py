@@ -15,6 +15,8 @@ class Tournament:
     backQueue = 521693581589741573
     leader = 519185793907032083
 
+    
+
     # --- methods
     # constructor
     def __init__(self, bot):
@@ -115,6 +117,7 @@ class Tournament:
 
     async def team_joined(self, ctx, pos: int, team_id: int):
         """DISCORD WORKFLOW"""
+        await self.bot.get_guild(self.bot.NorthgardBattle).get_channel
         await ctx.send(f"Position: {pos}, TeamID: {team_id}")
 
 
