@@ -15,7 +15,7 @@ class Tournament:
     backQueue = 521693581589741573
     leader = 519185793907032083
 
-    
+
 
     # --- methods
     # constructor
@@ -97,15 +97,16 @@ class Tournament:
                                 INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
                                 VALUES (1, ?, ?, ?)""", (dict[reply.content], team[0], counter))
                             await db.commit()
-                            await self.team_joined(ctx, counter, team[0])
-                            return await ctx.send(f"Your Team '{team[1]}' **successfully joined** '{reply.content}'")
+                            await self.team_joined(ctx, pos = counter, team_id = team[0])
+                            return await ctx.author.send(f"Your Team '{team[1]}' **successfully joined** '{reply.content}'")
                         else:
                             # push to BackupQueue
                             await db.execute("""
                                 INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
                                 VALUES (2, ?, ?, ?)""", (dict[reply.content], team[0], counter))
                             await db.commit()
-                            return await ctx.send(
+                            await self.team_joined(ctx, pos = counter, team_id = team[0])
+                            return await ctx.author.send(
                                 f"""Your Team '{team[1]}' **successfully joined** '{tournament[1]}'
                                 \nYou entered the BackupQueue at Position #{(counter)-tournament[2]}""")
                 else:
@@ -117,11 +118,30 @@ class Tournament:
 
     async def team_joined(self, ctx, pos: int, team_id: int):
         """DISCORD WORKFLOW"""
-        await self.bot.get_guild(self.bot.NorthgardBattle).get_channel
-        await ctx.send(f"Position: {pos}, TeamID: {team_id}")
-
-
-
+        server = self.bot.get_guild(self.bot.northgardbattle)
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            async with db.execute("""
+                SELECT discord.InternalID, player.Name, teamplayer.RoleID, team.Name
+                FROM teamplayer
+                LEFT JOIN discord ON discord.ReferenceID = teamplayer.PlayerID
+                LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                LEFT JOIN team ON team.TeamID = teamplayer.TeamID
+                WHERE discord.Reference = "Player" AND teamplayer.TeamID = ?""", (team_id,)) as cursor:
+                async for result in cursor:
+                    member = server.get_member(result[0])
+                    if pos <= 16:
+                        if server.get_role(self.participant) not in member.roles:
+                            await member.add_roles(server.get_role(self.participant))
+                    else:
+                        if server.get_role(self.backQueue) not in member.roles:
+                            await member.add_roles(server.get_role(self.backQueue))
+        if pos <= 16:
+            desc = f"`✔️` Team **{result[3]}** joined the Tournament."
+        else:
+            desc = f"`✔️` Team **{result[3]}** joined the Tournament\nIt got set to the BackupQueue (Position: #{pos-16})."
+        embed = discord.Embed(description=desc,colour=discord.Colour.green(), timestamp = datetime.now())
+        embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+        return await server.get_channel(534764595970310145).send(embed=embed)
 
 
     # set_date(): async
