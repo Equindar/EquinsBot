@@ -13,7 +13,9 @@ class Northgard:
                 'ext.Northgard.battle.player',
                 'ext.Northgard.battle.team',
                 'ext.Northgard.battle.tournament',
-                'ext.Northgard.battle.achievement'
+                'ext.Northgard.battle.achievement',
+                'ext.Northgard.battle.blueprint',
+                'ext.Northgard.battle.guide'
               ]
 
     # --- methods

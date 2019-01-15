@@ -116,8 +116,7 @@ class DEV:
     @commands.is_owner()
     async def test(self, ctx):
         """DEV function !test for testing"""
-
-        await ctx.send(ctx.channel.id)
+        await ctx.send(f"ID: {ctx.channel.id}")
 
 #        for member in ctx.guild.members:
 #            if member.bot:
