@@ -33,11 +33,15 @@ class CodeGen:
     @commands.command(name="code", hidden=True)
     async def get_code(self, ctx, blocks: int, size: int, amount: int = 1, delimiter: str = "-"):
         """generating Codes"""
+        if not 0 < amount <= 20:
+            return await ctx.author.send("Amount of Codes exceeds the limits...\n`Amount: 1 - 20`")
+        if blocks * size > 50:
+            return await ctx.author.send("Max-Length of a Code reached.\n`Limit: 50 characters`")
         result = ""
         list = self.generate(blocks, size, amount, delimiter)
         for item in list:
             result += f"`{item}`\n"
-            
+
         embed = discord.Embed(colour=3158584)
         embed.set_footer(text=f"--- Blocks: {blocks} --- || --- Block-Size: {size} ---")
         embed.add_field(name=f"Code Generator ({amount})", value=result, inline=True)
