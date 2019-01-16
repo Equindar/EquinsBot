@@ -37,7 +37,7 @@ class Guide:
             embed.add_field(name="Topic", value=topic,inline=True)
             embed.add_field(name="\u200b \u200b", value=value, inline=True)
             embed.add_field(name="\u200b \u200b", value="Thanks for reading... ~Equindar", inline=False)
-            return await ctx.author.send(content="\u200b \u200b", embed=embed)
+            return await ctx.author.send(embed=embed)
 
 
     # guide_player(): async
@@ -56,7 +56,7 @@ class Guide:
         embed.add_field(name="How can i list all registered Players?", value="```!player list\n!player list 2\n!player list [page]```", inline=True)
         embed.add_field(name="How can i delete my Player profile?", value="```!player delete```", inline=True)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you know now the Basics, how to manage Player profiles!**\n*Next Step: Basics of a Team:* `!guide team`")
-        return await ctx.author.send(content="\u200b \u200b", embed=embed)
+        return await ctx.author.send(embed=embed)
 
 
     # guide_team(): async
@@ -77,7 +77,7 @@ class Guide:
         embed.add_field(name="How do i check other Teams?", value="```!team show [Name]```", inline=True)
         embed.add_field(name="How can i leave my Team?", value="```!team leave```", inline=True)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you know now the Basics of your Team!**\n*Next Step: In-Dept of a Team:* `!guide leader`")
-        return await ctx.author.send(content="\u200b \u200b", embed=embed)
+        return await ctx.author.send(embed=embed)
 
 
     # guide_leader(): async
@@ -97,7 +97,7 @@ class Guide:
         embed.add_field(name="How can i change the Team roster?", value="```!team assign Member [Player Name]\n!team assign Substitute [Player Name]```", inline=False)
         embed.add_field(name="How can i disband my Team?", value="```!team disband```", inline=False)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you know now how to manage your Team!**\n*Next Step: Tournaments:* `!guide tournament`")
-        return await ctx.author.send(content="\u200b \u200b", embed=embed)
+        return await ctx.author.send(embed=embed)
 
 
     # guide_tournament(): async
@@ -111,7 +111,7 @@ class Guide:
         embed.add_field(name="How do i let my Team join a Tournament?", value="```Diff\n!tournament join```", inline=False)
         embed.add_field(name="More features coming soon...", value="\u200b \u200b", inline=False)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you can deal with tournaments!**\n*Next Step:* `coming soon`")
-        return await ctx.author.send(content="\u200b \u200b", embed=embed)
+        return await ctx.author.send(embed=embed)
 
 
     # guide_crashcourse(): async
@@ -129,7 +129,7 @@ class Guide:
         embed.add_field(name="Step #4: Join the Tournament", value="```!tournament join```", inline=False)
         embed.add_field(name="Last Step:", value="Fill up your Team Roster before **Team Confirmation**", inline=True)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you took the 3 minutes Crash Course!**\nFeel free to read the Guides: `!guide` later.")
-        return await ctx.author.send(content="\u200b \u200b", embed=embed)
+        return await ctx.author.send(embed=embed)
 
 
 # --- routine: setup/assign cog
