@@ -56,7 +56,7 @@ class Blueprint:
         embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
         embed.add_field(name="Lobby Settings", value=setting, inline=True)
         embed.add_field(name="\u200b \u200b", value=value, inline=True)
-        return await ctx.send(content="\u200b \u200b", embed=embed)
+        return await ctx.send(embed=embed)
 
 
     # announcement(): async
@@ -81,7 +81,7 @@ class Blueprint:
         embed.add_field(name="Prize (team based)", value="1st Place: 120€", inline=True)
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
         embed.add_field(name="Match-Ups", value="2 vs 2", inline=True)
-        return await ctx.send(content="\u200b \u200b", embed=embed)
+        return await ctx.send(embed=embed)
 
 
     @blueprint.command()
@@ -102,7 +102,7 @@ class Blueprint:
         embed.add_field(name="Questions?", value=f"*Post your question on {self.bot.get_guild(self.bot.northgardbattle).get_channel(532526880113295361).mention} or contact {self.bot.get_guild(self.bot.northgardbattle).get_role(509005550948974603).mention} / {self.bot.get_guild(self.bot.northgardbattle).get_role(519434488225333269).mention}.*")
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
-        return await ctx.send(content="\u200b \u200b", embed=embed)
+        return await ctx.send(embed=embed)
 
 
 # --- routine: setup/assign cog
