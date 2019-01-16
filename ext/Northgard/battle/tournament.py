@@ -16,7 +16,6 @@ class Tournament:
     leader = 519185793907032083
 
 
-
     # --- methods
     # constructor
     def __init__(self, bot):
@@ -24,7 +23,7 @@ class Tournament:
 
 
     # tournament(): async
-    @commands.group(hidden=True)
+    @commands.group()
     async def tournament(self, ctx):
         """Manage the Tournament"""
         if ctx.invoked_subcommand is None:
@@ -73,13 +72,13 @@ class Tournament:
                 await cursor.close()
                 # check: in Team and Team Leader?
                 if team is not None:
-                    await ctx.send(f"Are you sure, you want to join an active Tournament?\n{output}")
+                    await ctx.author.send(f"Are you sure, you want to join an active Tournament?\n{output}")
                     def check(msg):
-                        return msg.content in dict and msg.channel == ctx.channel
+                        return msg.content in dict and msg.channel == ctx.author.dm_channel
                     try:
                         reply = await self.bot.wait_for('message', check=check, timeout=20.0)
                     except asyncio.TimeoutError:
-                        await ctx.send("Your Tournament-Join request (20sec) timed out. Retry...")
+                        await ctx.author.send("Your Tournament-Join request (20sec) timed out. Retry...")
                     else:
                         async with db.execute("""
                             SELECT Count(participant.ParticipantID), team.TeamID
@@ -89,7 +88,7 @@ class Tournament:
                             counter = 0
                             async for result in cursor:
                                 if result[1] == team[0]:
-                                    return await ctx.send(f"Your Team '{team[1]}' already joined '{reply.content}'")
+                                    return await ctx.author.send(f"Your Team '{team[1]}' already joined '{reply.content}'")
                                 counter += 1
                         if counter < tournament[0][2]:
                             # push to Participant
@@ -110,15 +109,16 @@ class Tournament:
                                 f"""Your Team '{team[1]}' **successfully joined** '{tournament[1]}'
                                 \nYou entered the BackupQueue at Position #{(counter)-tournament[2]}""")
                 else:
-                    await ctx.send("""You **cannot join** a tournament.\n
+                    await ctx.author.send("""You **cannot join** a tournament.\n
                         \n__Reasons can be:__\nYou are not in a Team.\nYou are not the Team Leader.""")
             else:
-                return await ctx.send("No active (joinable) Tournament found.")
+                return await ctx.author.send("No active (joinable) Tournament found.")
 
 
     async def team_joined(self, ctx, pos: int, team_id: int):
         """DISCORD WORKFLOW"""
         server = self.bot.get_guild(self.bot.northgardbattle)
+        team = None
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
             async with db.execute("""
                 SELECT discord.InternalID, player.Name, teamplayer.RoleID, team.Name
@@ -128,18 +128,37 @@ class Tournament:
                 LEFT JOIN team ON team.TeamID = teamplayer.TeamID
                 WHERE discord.Reference = "Player" AND teamplayer.TeamID = ?""", (team_id,)) as cursor:
                 async for result in cursor:
+                    if team is None:
+                        for item in server.roles:
+                            if f"Team: {result[3]}" == item.name:
+                                team = item
+                                break
+                    if team is None:
+                        team = await server.create_role(name = f"Team: {result[3]}")
                     member = server.get_member(result[0])
+                    if team not in member.roles:
+                        await member.add_roles(team)
                     if pos <= 16:
                         if server.get_role(self.participant) not in member.roles:
                             await member.add_roles(server.get_role(self.participant))
                     else:
                         if server.get_role(self.backQueue) not in member.roles:
                             await member.add_roles(server.get_role(self.backQueue))
+        for item in  server.categories:
+            if item.id == 519174714002898984:
+                category = item
+        perms = {   team: discord.PermissionOverwrite(read_messages=True, connect=True, speak=True),
+                    server.get_role(self.staff): discord.PermissionOverwrite(read_messages=True, connect=True, speak=True),
+                    server.get_role(self.participant): discord.PermissionOverwrite(read_messages=False),
+                    server.get_role(self.backQueue): discord.PermissionOverwrite(read_messages=False),
+                    server.default_role: discord.PermissionOverwrite(read_messages=False, connect=False)
+        }
+        team_ch = await server.create_voice_channel(f"[#{pos}] {result[3]}", category=category, overwrites=perms)
         if pos <= 16:
             desc = f"`✔️` Team **{result[3]}** joined the Tournament."
         else:
             desc = f"`✔️` Team **{result[3]}** joined the Tournament\nIt got set to the BackupQueue (Position: #{pos-16})."
-        embed = discord.Embed(description=desc,colour=discord.Colour.green(), timestamp = datetime.now())
+        embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
         embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
         return await server.get_channel(534764595970310145).send(embed=embed)
 
@@ -184,11 +203,11 @@ class Tournament:
         embed = discord.Embed(colour=6809006, timestamp = date - timedelta(hours=1))
         embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
-        await ctx.send(content='used Feature: Deadline `!deadline`', embed=embed)
+        await ctx.send(embed=embed)
 
 
     # setup_tournament(): async
-    @tournament.command(name="setup")
+    @tournament.command(name="setup", hidden=True)
     @commands.is_owner()
     async def setup_tournament(self, ctx, *, name: str = "Untitled Tournament"):
         """create a new Tournament"""
@@ -218,7 +237,7 @@ class Tournament:
         ch_results  = await ctx.guild.create_text_channel("Match Results", category=category)
         # set channel perms
         await ch_info.set_permissions(ow_info)
-        await ctx.send("Tournament got set up.")
+        await ctx.author.send("Tournament got set up.")
 
 
 # --- routine: setup/assign cog
