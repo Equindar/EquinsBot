@@ -23,8 +23,7 @@ class Errors:
         else:
             source = f"DirectMessage|{ctx.author}"
         await self.bot.get_channel(self.bot.log).send(
-            f"""`❌` `⏱️ {timestamp}` [{source}] issued: `{ctx.message.content}`\n
-                ```Error: {error}```""")
+            f"""`❌` `⏱️ {timestamp}` [{source}] issued: `{ctx.message.content}`\n```Error: {error}```""")
 
         # prevent execution of custom on_error handler
         if hasattr(ctx.command, 'on_error'):
