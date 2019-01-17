@@ -163,13 +163,13 @@ class Team:
                 SELECT player.PlayerID, player.StatusID, teamplayer.TeamID
                 FROM player
                 LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
-                WHERE player.Name = ?;""", ( ctx.author.name, ))
+                WHERE player.Name = ?;""", (ctx.author.name,))
             player = await cursor.fetchone()
             await cursor.close()
             # check: is player registered?
             if player is not None:
                 # check: has no Team?
-                if player[2] == "None":
+                if player[2] == None:
                     # check: is verified player?
                     if player[1] == 2:
                         cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ?;", (name,))
