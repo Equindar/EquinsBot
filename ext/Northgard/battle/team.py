@@ -30,7 +30,7 @@ class Team:
         if result is not None:
             await ctx.invoke(self.show_team, name = result[0])
         else:
-            await ctx.send("You are not part of a Team")
+            await ctx.author.send("You are not part of a Team")
 
 
     # team(): async
@@ -188,13 +188,13 @@ class Team:
                             await db.commit()
                             return await ctx.send(f"{ctx.author.mention} successfully registered the Team '{name}'")
                         else:
-                            return await ctx.send(f"Team '{name}' is already registered, use a unique team name.")
+                            return await ctx.author.send(f"Team '{name}' is already registered, use a unique team name.")
                     else:
-                        return await ctx.send(f"Your Player Profile '{ctx.author.name}' isnt 'verified' yet.")
+                        return await ctx.author.send(f"Your Player Profile '{ctx.author.name}' isnt 'verified' yet.")
                 else:
-                    return await ctx.send("You are already part of a Team.")
+                    return await ctx.author.send("You are already part of a Team.")
             else:
-                await ctx.send("""
+                await ctx.author.send("""
                     Only verfied players can register teams.\n
                     Use: `!register` to create your player profile.\n
                     After your Status became 'verified', try again.""")
@@ -243,13 +243,13 @@ class Team:
                     if not issues:
                         await db.execute("UPDATE team SET StatusID = 2 WHERE TeamID = ?;", (team[0],))
                         await db.commit()
-                        await ctx.send(f"Team '{name}' got **verified**.")
+                        await ctx.author.send(f"Team '{name}' got **verified**.")
                     else:
-                        await ctx.send(f"Team '{name}' cannot be verified.\nPlayer Status: `{str(issues)}`")
+                        await ctx.author.send(f"Team '{name}' cannot be verified.\nPlayer Status: `{str(issues)}`")
                 else:
-                    await ctx.send(f"Team '{name}' is already **verified**.")
+                    await ctx.author.send(f"Team '{name}' is already **verified**.")
             else:
-                await ctx.send(f"Team '{name}' not found.")
+                await ctx.author.send(f"Team '{name}' not found.")
 
 
     # invite_to_team(): async

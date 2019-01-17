@@ -56,7 +56,6 @@ class Achievements:
 
     # grant_achievement(): async
     @achievement.command(name="assign")
-    @commands.is_owner()
     async def assign_achievement(self, ctx, id: int, *, target: str):
         """assign an Achievement to a Player"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:

@@ -161,7 +161,7 @@ class Player:
                 INSERT INTO player (Name, Registration, StatusID)
                 VALUES (?, ?, 1);""", (name, str(datetime.now())))
             await db.commit()
-        await ctx.send(f"Player '{name}' got sucessfully added.")
+        await ctx.author.send(f"Player '{name}' got sucessfully added.")
 
 
     # verify_player(): async
@@ -171,7 +171,7 @@ class Player:
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
             await db.execute("UPDATE player SET StatusID = 2 WHERE name = ?;", (name,))
             await db.commit()
-        await ctx.send(f"Player '{name}' got verified.")
+        await ctx.author.send(f"Player '{name}' got verified.")
 
 
     # delete_player(): async
@@ -198,15 +198,15 @@ class Player:
                 try:
                     reply = await self.bot.wait_for('message', check=check, timeout=10.0)
                 except asyncio.TimeoutError:
-                    await ctx.send("Your Player-Delete request (10sec) timed out. Retry...")
+                    await ctx.author.send("Your Player-Delete request (10sec) timed out. Retry...")
                 else:
                     await db.execute("DELETE FROM playerachievements WHERE PlayerID = ? ;", (player[0],))
                     await db.execute("DELETE FROM teamplayer WHERE PlayerID = ? ;", (player[0],))
                     await db.execute("DELETE FROM player WHERE PlayerID = ? ;", (player[0],))
                     await db.commit()
-                    return await ctx.send("You successfully deleted your Player profile.")
+                    return await ctx.author.send("You successfully deleted your Player profile.")
             else:
-                await ctx.send("You dont have a registered Player profile.")
+                await ctx.author.send("You dont have a registered Player profile.")
 
 
     # edit_player(): async
@@ -222,7 +222,7 @@ class Player:
                 elif subject.lower() == "description":
                     await db.execute('UPDATE player SET Description = ? WHERE Name = ?;', (data,ctx.author.name))
                 await db.commit()
-            await ctx.send(f"Your Player-Data '{subject}' got set to `{data}`")
+            await ctx.author.send(f"Your Player-Data '{subject}' got set to `{data}`")
 
 
     # [DEV] dummy(): async
