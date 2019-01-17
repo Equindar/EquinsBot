@@ -1,6 +1,7 @@
 # --- imports
 import discord
 import asyncio
+import aiosqlite
 from discord.ext import commands
 from datetime import datetime
 
@@ -158,20 +159,19 @@ class DEV:
     @commands.is_owner()
     async def bla(self, ctx):
         """bla test funtion"""
-        #TO-DO: check for invoker in a team
-        await ctx.send("Are you sure, you want to disband your Team?\nThis action cannot be reverted.\nType `disband` to confirm...")
-
-        def check(msg):
-            return msg.content == 'disband' and msg.channel == ctx.channel
-
-        try:
-            reply = await self.bot.wait_for('message', check=check, timeout=10.0)
-        except asyncio.TimeoutError:
-            await ctx.send("Your Team-Disband request (10sec) timed out. Retry...")
-        else:
-            # TO-DO: database operations
-            await ctx.send("You successfully disbanded your Team")
-
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            cursor = await db.execute("""
+                SELECT player.PlayerID, player.StatusID, teamplayer.TeamID
+                FROM player
+                LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
+                WHERE player.Name = 'Oyster';""")
+            player = await cursor.fetchone()
+            await cursor.close()
+            print(player[2])
+            if player[2] == None:
+                print("none")
+            else:
+                print("not None")
 
 
 #@bot.command()

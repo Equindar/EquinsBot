@@ -166,7 +166,6 @@ class Player:
 
     # verify_player(): async
     @player.command(name="verify", hidden=True)
-    @commands.is_owner()
     async def verify_player(self, ctx, *, name: str):
         """verify a Player"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:

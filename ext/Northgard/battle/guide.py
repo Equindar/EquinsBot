@@ -70,7 +70,7 @@ class Guide:
             It is required to join NorthgardBattle tournaments."""
         embed = discord.Embed(title="__Guide **Basics: Team**__",description=desc,colour=3158584)
         embed.set_footer(text="--- EquinsBot --- || --- Guide #2 (\"Basics: Team\") --- ")
-        embed.add_field(name="How do i register my Team?", value="```Diff\n!team register [name]\n```", inline=False)
+        embed.add_field(name="How do i register my Team?", value="```Diff\n!team register [team name]\n``` \u200b \u200b\u200b \u200b\u200b \u200b\u200b \u200b `⚠️` Only __verified__ Players can register a new Team.\n\u200b \u200b", inline=False)
         embed.add_field(name="How do i join a Team?", value="```Diff\n!team join [code: XXXX-XXXX-XXXX]```", inline=False)
         embed.add_field(name="How can i check my Team?", value="```!myteam```", inline=True)
         embed.add_field(name="How can i list all registered Teams?", value="```!team list\n!team list 2\n!team list [page]```", inline=True)
@@ -125,7 +125,7 @@ class Guide:
         embed.set_footer(text="--- EquinsBot --- || --- Crash Course (\"Join the Tournament\") --- ")
         embed.add_field(name="Step #1: Register your Player profile", value="```!register```",inline=False)
         embed.add_field(name="Step #2: Bind your Steam Profile to your Profile", value="```!player set steam [https://steamcommunity.com/ ... ]```", inline=False)
-        embed.add_field(name="Step #3: Register your Team", value="```!team register```", inline=False)
+        embed.add_field(name="Step #3: Register your Team", value="```!team register [team name]``` \u200b \u200b\u200b \u200b\u200b \u200b\u200b \u200b `⚠️` Only __verified__ Players can register a new Team.\n\u200b \u200b", inline=False)
         embed.add_field(name="Step #4: Join the Tournament", value="```!tournament join```", inline=False)
         embed.add_field(name="Last Step:", value="Fill up your Team Roster before **Team Confirmation**", inline=True)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you took the 3 minutes Crash Course!**\nFeel free to read the Guides: `!guide` later.")

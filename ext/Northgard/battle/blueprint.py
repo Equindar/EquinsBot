@@ -69,7 +69,8 @@ class Blueprint:
             *Its again time to be victorious for the first time im 2019.
             Compete with your team in our `Bloody January 2019` tournament and face 15 other teams.
             Train, fight, win...*
-            \n```\"Grab your strongest brother in arms and sign up to fight until you're the last one standing\"\n\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b~Agrathan```
+            ~ NorthgardBattle Staff
+            \n```\"Grab your strongest brother in arms and sign up to fight until you're the last one standing\"\n\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b~Weihn8smann```
             For more information check out the NorthgardBattle Discord server:
             https://discord.gg/aBFNP27""",
                               colour=discord.Colour.dark_red(),
@@ -77,10 +78,98 @@ class Blueprint:
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_image(url="https://i.imgur.com/AMxwdFU.png")
         embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
-        embed.add_field(name="Start", value="**2018-01-26 **(Sat.)\n**12:00 pm CET**", inline=True)
-        embed.add_field(name="Prize (team based)", value="1st Place: 120€", inline=True)
+        embed.add_field(name="Start", value="**2019-01-26 **(Sat.)\n**12:00 pm CET**", inline=True)
+        embed.add_field(name="Prize (team based)", value="**1st Place: 120€**", inline=True)
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
         embed.add_field(name="Match-Ups", value="2 vs 2", inline=True)
+        return await ctx.send(content="*NorthgardBattle is hosting a new Tournament*, @everyone", embed=embed)
+
+
+    # news(): async
+    @blueprint.command()
+    async def news(self, ctx):
+        """Announcement Blueprint"""
+
+        embed = discord.Embed(title="__Announcement: **Bloody January 2019**__",description="""
+            Ahoi Warchief's
+            *Its again time to be victorious for the first time im 2019.
+            Compete with your team in our `Bloody January 2019` tournament and face 15 other teams.
+            Train, fight, win...*
+            ~ NorthgardBattle Staff
+            \n```\"Grab your strongest brother in arms and sign up to fight until you're the last one standing\"\n\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b~Agrathan```""",
+                              colour=discord.Colour.dark_red(),
+                              timestamp = datetime.now())
+        embed.set_author(name="NorthgardBattle Staff")
+        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
+        embed.set_image(url="https://i.imgur.com/AMxwdFU.png")
+        embed.add_field(name="Start", value="**2019-01-26 **(Sat.)\n**12:00 pm CET**", inline=True)
+        embed.add_field(name="Prize (team based)", value="**1st Place: 120€**", inline=True)
+        embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
+        embed.add_field(name="Match-Ups", value="2 vs 2", inline=True)
+        return await ctx.send(content="A new NorthgardBattle Tournament, YAY! @everyone", embed=embed)
+
+
+    # announcement(): async
+    @blueprint.command()
+    async def information(self, ctx):
+        """Information Blueprint"""
+        server = self.bot.get_guild(self.bot.northgardbattle)
+        embed = discord.Embed(title="__Information: **Bloody January 2019**__",description="""
+            Hello Warlords of Northgard!
+            ... and welcome to the "Bloody January 2019"-Tournament.
+
+            It's a **2 v 2** Tournament with **16** Teams compete against each other.""",
+                              colour=discord.Colour.dark_red(),
+                              timestamp = datetime.now())
+        embed.set_author(name="NorthgardBattle Staff")
+        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
+        embed.add_field(name="__Start:__", value="```2019-01-26 (Sat.)\n12:00 pm CET```", inline=True)
+        embed.add_field(name="__Prize: (team based)__", value="```1st Place: 120 €```", inline=True)
+        embed.add_field(name="\u200b \u200b", value="\u200b \u200b", inline=True)
+        embed.add_field(name="Registration:", value=server.get_channel(534764595970310145).mention, inline=True)
+        embed.add_field(name="Bracket:", value=server.get_channel(532526879362777088).mention, inline=True)
+        embed.add_field(name="Match-Results:", value=server.get_channel(519185737573335050).mention, inline=True)
+        return await ctx.send(embed=embed)
+
+
+    # announcement(): async
+    @blueprint.command()
+    async def details(self, ctx):
+        """Details Blueprint"""
+        desc = """
+            **Registration:**
+            Once 16 Teams are registered, the `BackUp-Queue` is enabled.
+            *Further team registration are put into the queue and getting chronologically replaced, when a team disband or dont show up intime at the tournament.*
+            Let the hope die last!
+
+            **Bracket:**
+            When all 16 teams are confirmed, the Bracket gets shuffled and published.
+            The Bracket will show what team that is going to create the lobby. It is very important that you check the bracket to see who your opponent is. When the lobby is created, the other team has 10 min to join and start the game. If not, they will auto loose.
+
+            **Bans:**
+            Each team will have the option to BAN a clan. The 2 clans that are banned can not be played by either team! Performing the Banning Phase in the Game Lobby!
+
+            **Disconnects:**
+            If someone during game gets disconnected, you cannot start over. This is yet again because we have to provide a good flow so we don’t have to wait to long for next match to start.
+
+            **Match-Results:**
+            As soon as the match is finished, you have to notify it with the winning team name so we can update the bracket. The Team Leader of the winning Team attachs anEndGame-Screenshot as evidence.
+
+            **Broadcasts / Streaming:**
+            Most of the games will be streamed by some streamers. They will have to add you on steam so they can be able to stream it. So check your friends request on steam so you can add the streamers."""
+        server = self.bot.get_guild(self.bot.northgardbattle)
+        embed = discord.Embed(title="__Details: **Bloody January 2019**__",description=desc,colour=discord.Colour.dark_red(),timestamp = datetime.now())
+        embed.set_author(name="NorthgardBattle Staff")
+        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
+        return await ctx.send(embed=embed)
+
+
+    # announcement(): async
+    @blueprint.command()
+    async def banner(self, ctx):
+        """Banner Blueprint"""
+        embed = discord.Embed(colour=discord.Colour.dark_red())
+        embed.set_image(url="https://i.imgur.com/AMxwdFU.png")
         return await ctx.send(embed=embed)
 
 

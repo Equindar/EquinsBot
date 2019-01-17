@@ -174,6 +174,41 @@ class Tournament:
 
     # deadline(): async
     @commands.command()
+    @commands.is_owner()
+    async def all_deadline(self, ctx):
+        """[DEV] Deadline Display"""
+        emoji = {
+            0:':zero:', 1:':one:', 2:':two:', 3:':three:', 4:':four:',
+            5:":five:", 6:":six:", 7:":seven:", 8:":eight:", 9:":nine:"
+        }
+        now = datetime.now()
+        date = datetime(2019,1,26,12,0,0)
+        # create dict
+        td = date - now
+        if td.total_seconds() < 0:
+            return
+        d = {"D": td.days }
+        d["H"], rem = divmod(td.seconds, 3600)
+        d["M"], d["S"] = divmod(rem, 60)
+        # get string / + zfill()
+        s = ""
+        for key, value in d.items():
+            s += str(value).zfill(2) + " **:** "
+        # replace with dict
+        x = ""
+        for c in s[:-7]:
+            if(c.isdigit()):
+                x += emoji[int(c)]
+            else:
+                x += c
+        embed = discord.Embed(colour=3158584, timestamp = date)
+        embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
+                        value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
+        await ctx.send(content="The sands are running out, @everyone", embed=embed)
+
+
+    # deadline(): async
+    @commands.command()
     async def deadline(self, ctx):
         """[DEV] Deadline Display"""
         emoji = {
@@ -200,7 +235,7 @@ class Tournament:
                 x += emoji[int(c)]
             else:
                 x += c
-        embed = discord.Embed(colour=6809006, timestamp = date - timedelta(hours=1))
+        embed = discord.Embed(colour=3158584, timestamp = date)
         embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
         await ctx.send(embed=embed)
