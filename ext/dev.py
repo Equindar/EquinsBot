@@ -156,22 +156,10 @@ class DEV:
 
 
     @commands.command(hidden=True)
-    @commands.is_owner()
     async def bla(self, ctx):
         """bla test funtion"""
-        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            cursor = await db.execute("""
-                SELECT player.PlayerID, player.StatusID, teamplayer.TeamID
-                FROM player
-                LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
-                WHERE player.Name = 'Oyster';""")
-            player = await cursor.fetchone()
-            await cursor.close()
-            print(player[2])
-            if player[2] == None:
-                print("none")
-            else:
-                print("not None")
+        str = "Leader"
+        await ctx.send(f"`{str:<9}:`")
 
 
 #@bot.command()

@@ -29,7 +29,7 @@ class Achievements:
             async with db.execute("SELECT * FROM achievements LIMIT ?, 15;", ((page-1) * 15, )) as cursor:
                 achievements = ""
                 async for result in cursor:
-                    achievements += f"`#{result[0]}` `{result[1]}` {result[2]}\n"
+                    achievements += f"`#{result[0]:>2}` `{result[1]}` {result[2]}\n"
         # generate embed
         embed = discord.Embed(title="__Achievement List__",
                               description=f"List of all registered Achievements in Northgard Battle\n \nPage: {page}",

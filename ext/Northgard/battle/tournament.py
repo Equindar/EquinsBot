@@ -43,8 +43,64 @@ class Tournament:
         await ctx.send(f"Tournament '{name}' got **sucessfully added**.")
 
 
+    # show_tournament(): async
+    @tournament.command(name="show", hidden=True)
+    async def show_tournament(self, ctx, *, name: str):
+        """display a Tournament"""
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            async with db.execute("""
+                SELECT participant.Position, team.Name, AVG(player.Points),
+                       COUNT(teamplayer.PlayerID), team.StatusID, status.Value
+                FROM team
+                LEFT JOIN teamplayer ON team.TeamID = teamplayer.TeamID
+                LEFT JOIN participant ON participant.TeamID = team.TeamID
+                LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                LEFT JOIN status ON participant.StatusID = status.StatusID
+                LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
+                WHERE tournament.Name = ?
+                GROUP BY team.TeamID
+                ORDER BY participant.Position ASC;""", (name,)) as cursor:
+
+                part_team = ""
+                part_pts = ""
+                part_stati = ""
+                back_team = ""
+                back_pts = ""
+                back_stati = ""
+                counter = 0
+                async for result in cursor:
+                    # data manipulation: db result (tuple)
+                    if counter < 16:
+                        part_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
+                        part_pts += f"{result[2]} pts \u200b \n"
+                        part_stati += f"{result[5]}\n"
+                    else:
+                        back_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
+                        back_pts += f"{result[2]} pts \u200b \n"
+                        back_stati += f"{result[5]}\n"
+                    counter += 1
+        # generate embed
+        embed = discord.Embed(title=f"__{name}__",
+                              description=f"List of all joined Teams",
+                              colour=discord.Colour.dark_red(),
+                              timestamp = datetime.now())
+        embed.set_footer(text="--- List: sorted by Position --- ||")
+        if not part_team:
+            embed.add_field(name="Participants", value="no teams listed here.", inline=False)
+        else:
+            embed.add_field(name="`Pos` Participants", value=part_team, inline=True)
+            embed.add_field(name="Points", value=part_pts, inline=True)
+            embed.add_field(name="Confirmation", value=part_stati, inline=True)
+        if not back_team:
+            embed.add_field(name="Backup-Queue", value="no teams listed here.", inline=False)
+        else:
+            embed.add_field(name="`Pos` Backup-Queue", value=back_team, inline=True)
+            embed.add_field(name="Points", value=back_pts, inline=True)
+            embed.add_field(name="Confirmation", value=back_stati, inline=True)
+        await ctx.send(embed=embed)
+
     # join_tournament(): async
-    @tournament.command(name="join", hidden=True)
+    @tournament.command(name="join")
     async def join_tournament(self, ctx):
         """join an active Tournament"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
@@ -67,7 +123,7 @@ class Tournament:
                     FROM team
                     LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
                     LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
-                    WHERE teamplayer.RoleID = 2 AND player.Name = ?""", (ctx.author.name,))
+                    WHERE teamplayer.RoleID = 2 AND player.Name = ?;""", (ctx.author.name,))
                 team = await cursor.fetchone()
                 await cursor.close()
                 # check: in Team and Team Leader?
@@ -81,33 +137,37 @@ class Tournament:
                         await ctx.author.send("Your Tournament-Join request (20sec) timed out. Retry...")
                     else:
                         async with db.execute("""
-                            SELECT Count(participant.ParticipantID), team.TeamID
+                            SELECT team.TeamID, participant.Position, tournament.TeamLimit
                             FROM participant
                             LEFT JOIN team ON team.TeamID = participant.TeamID
-                            WHERE TournamentID = ?""", (dict[reply.content],)) as cursor:
+                            LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
+                            WHERE participant.TournamentID = ?""", (dict[reply.content],)) as cursor:
                             counter = 0
                             async for result in cursor:
-                                if result[1] == team[0]:
+                                if result[0] == team[0]:
                                     return await ctx.author.send(f"Your Team '{team[1]}' already joined '{reply.content}'")
+                                position = result[1]
+                                limit = result[2]
                                 counter += 1
-                        if counter < tournament[0][2]:
+
+                        if counter <= limit:
                             # push to Participant
                             await db.execute("""
                                 INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
-                                VALUES (1, ?, ?, ?)""", (dict[reply.content], team[0], counter))
+                                VALUES (1, ?, ?, ?)""", (dict[reply.content], team[0], position + 1))
                             await db.commit()
-                            await self.team_joined(ctx, pos = counter, team_id = team[0])
+                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0])
                             return await ctx.author.send(f"Your Team '{team[1]}' **successfully joined** '{reply.content}'")
                         else:
                             # push to BackupQueue
                             await db.execute("""
                                 INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
-                                VALUES (2, ?, ?, ?)""", (dict[reply.content], team[0], counter))
+                                VALUES (2, ?, ?, ?)""", (dict[reply.content], team[0], position + 1))
                             await db.commit()
-                            await self.team_joined(ctx, pos = counter, team_id = team[0])
+                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0])
                             return await ctx.author.send(
                                 f"""Your Team '{team[1]}' **successfully joined** '{tournament[1]}'
-                                \nYou entered the BackupQueue at Position #{(counter)-tournament[2]}""")
+                                \nYou entered the BackupQueue at Position #{(counter) - limit}""")
                 else:
                     await ctx.author.send("""You **cannot join** a tournament.\n
                         \n__Reasons can be:__\nYou are not in a Team.\nYou are not the Team Leader.""")
@@ -121,11 +181,12 @@ class Tournament:
         team = None
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
             async with db.execute("""
-                SELECT discord.InternalID, player.Name, teamplayer.RoleID, team.Name
+                SELECT discord.InternalID, player.Name, teamplayer.RoleID, team.Name, participant.Position
                 FROM teamplayer
                 LEFT JOIN discord ON discord.ReferenceID = teamplayer.PlayerID
                 LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
                 LEFT JOIN team ON team.TeamID = teamplayer.TeamID
+				LEFT JOIN participant ON participant.TeamID = team.TeamID
                 WHERE discord.Reference = "Player" AND teamplayer.TeamID = ?""", (team_id,)) as cursor:
                 async for result in cursor:
                     if team is None:
@@ -153,7 +214,7 @@ class Tournament:
                     server.get_role(self.backQueue): discord.PermissionOverwrite(read_messages=False),
                     server.default_role: discord.PermissionOverwrite(read_messages=False, connect=False)
         }
-        team_ch = await server.create_voice_channel(f"[#{pos}] {result[3]}", category=category, overwrites=perms)
+        team_ch = await server.create_voice_channel(f"[#{result[4]}] {result[3]}", category=category, overwrites=perms)
         if pos <= 16:
             desc = f"`✔️` Team **{result[3]}** joined the Tournament."
         else:
@@ -161,6 +222,72 @@ class Tournament:
         embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
         embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
         return await server.get_channel(534764595970310145).send(embed=embed)
+
+
+    # join_tournament(): async
+    @tournament.command(name="leave")
+    async def leave_tournament(self, ctx):
+        """join an active Tournament"""
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            # check: list active tournament
+            cursor = await db.execute("""
+                SELECT participant.ParticipantID, team.Name, tournament.Name, team.TeamID
+                FROM participant
+                LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
+                LEFT JOIN team ON team.TeamID = participant.TeamID
+                LEFT JOIN teamplayer ON teamplayer.TeamID = team.TeamID
+                LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                WHERE teamplayer.RoleID = 2 AND player.Name = ?;""", (ctx.author.name,))
+            participant = await cursor.fetchone()
+            await cursor.close()
+            if participant is not None:
+                await ctx.author.send(f"""Are you sure, your Team want to leave '{participant[2]}'?
+                    \nThis action cannot be reverted.\nType `leave` to confirm...""")
+                def check(msg):
+                    return msg.content == 'leave' and msg.channel == ctx.author.dm_channel
+                try:
+                    reply = await self.bot.wait_for('message', check=check, timeout=10.0)
+                except asyncio.TimeoutError:
+                    await ctx.author.send("Your Tournament-Leave request (10sec) timed out. Retry...")
+                else:
+                    await self.team_left(ctx, team_id = participant[3])
+                    await db.execute("DELETE FROM participant WHERE participant.ParticipantID = ?", (participant[0],))
+                    await db.commit()
+                    await ctx.author.send(f"Your Team '{participant[1]}' **successfully left** the Tournament.")
+                    desc = f"`❌` Team **{participant[1]}** left the Tournament."
+                    embed = discord.Embed(description=desc,colour=discord.Colour.red(), timestamp = datetime.now())
+                    embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(534764595970310145).send(embed=embed)
+            else:
+                await ctx.author.send("""You **cannot leave** the tournament.
+                    \n__Reasons can be:__\nYou are not in a Tournament.\nYou are not the Team Leader.""")
+
+
+    async def team_left(self, ctx, team_id: int):
+        """DISCORD WORKFLOW"""
+        server = self.bot.get_guild(self.bot.northgardbattle)
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            async with db.execute("""
+                SELECT discord.InternalID, player.Name, teamplayer.RoleID, team.Name
+                FROM player
+                LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
+                LEFT JOIN team ON team.TeamID = teamplayer.TeamID
+                LEFT JOIN discord ON discord.ReferenceID = player.PlayerID
+                WHERE discord.Reference = 'Player' AND team.TeamID = ?""", (team_id,)) as cursor:
+                async for result in cursor:
+                    member = server.get_member(result[0])
+                    if server.get_role(self.participant) in member.roles:
+                        await member.remove_roles(server.get_role(self.participant))
+                    if server.get_role(self.backQueue) in member.roles:
+                        await member.remove_roles(server.get_role(self.backQueue))
+
+                    for item in member.roles:
+                        if item.name == f"Team: {result[3]}":
+                            await member.remove_roles(server.get_role(item.id))
+
+                for item in server.voice_channels:
+                    if item.name[6:] == result[3]:
+                        await server.get_channel(item.id).delete()
 
 
     # set_date(): async

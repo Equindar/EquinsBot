@@ -96,9 +96,9 @@ class Team:
                 embed.add_field(name="Performance", value='**--- %.2f pts ---**' % (points / members), inline=True)
                 # Match History: `W 📈 +10 pts` -vs- `Team: Frostbite`\n`L 📉 -14 pts` -vs- `Team: Set in Stone`\n`W 📈 + 8 pts` -vs- `Team: Pinar`\n`W 📈 +24 pts` -vs- `Team: chip n dale`
                 embed.add_field(name="Match History (latest 5)", value="feature coming soon...", inline=True)
-                return await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+                return await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
             else:
-                await ctx.send(f"Team '{name}' not found.")
+                await ctx.author.send(f"Team '{name}' not found.")
 
 
 
@@ -138,7 +138,7 @@ class Team:
                     else:
                         leaders += "`no leader`"
                     leaders += "\n"
-                    teamname += f"`#{result[0]}` {result[2]} \u200b \u200b \u200b\n"
+                    teamname += f"`#{result[0]:>2}` {result[2]} \u200b \u200b \u200b\n"
         # generate embed
         embed = discord.Embed(title="__Team List__",
                               description=f"List of all registered teams in Northgard Battle\n \nPage: {page}",
@@ -150,7 +150,7 @@ class Team:
         else:
             embed.add_field(name="Team", value=teamname, inline=True)
             embed.add_field(name="Leader", value=leaders, inline=True)
-        await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+        await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
 
 
     # register_team(): async
@@ -215,7 +215,7 @@ class Team:
 
     # verify_team(): async
     @team.command(name="verify", hidden=True)
-    @commands.is_owner()
+    @commands.has_role(519421170517540864)
     async def verify_team(self, ctx, *, name: str):
         """verify a Team"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
@@ -228,21 +228,29 @@ class Team:
             if team is not None:
                 if team[1] != 2:
                     cursor = await db.execute("""
-                        SELECT player.Name, status.Value
+                        SELECT player.Name, status.Value, discord.InternalID, teamplayer.RoleID
                         FROM player
                         LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
                         LEFT JOIN team ON team.TeamID = teamplayer.TeamID
                         LEFT JOIN status ON status.StatusID = player.StatusID
-                        WHERE team.teamID = ?;""", (team[0],))
+                        LEFT JOIN discord ON discord.ReferenceID = player.PlayerID
+                        WHERE discord.Reference = "Player" AND team.teamID = ?;""", (team[0],))
                     players = await cursor.fetchall()
                     await cursor.close()
                     issues = { }
                     for item in players:
                         if item[1] != "verified":
                             issues[item[0]] = item[1]
+                        if item[3] == 2:
+                            leader_id = item[2]
                     if not issues:
                         await db.execute("UPDATE team SET StatusID = 2 WHERE TeamID = ?;", (team[0],))
                         await db.commit()
+                        desc = f"Your Team **{name}** got verified by {ctx.author.name}"
+                        embed = discord.Embed(description=desc,
+                            colour=discord.Colour.green(), timestamp = datetime.now())
+                        embed.set_footer(text="--- NorthgardBattle: Team Notification --- ||")
+                        await self.bot.get_guild(self.bot.northgardbattle).get_member(leader_id).send(embed=embed)
                         await ctx.author.send(f"Team '{name}' got **verified**.")
                     else:
                         await ctx.author.send(f"Team '{name}' cannot be verified.\nPlayer Status: `{str(issues)}`")
@@ -288,14 +296,14 @@ class Team:
                         embed = discord.Embed(title=f"Invite Code for __Team {type.lower().capitalize()}__",
                                               description=f"{code[0]}\n```\n!team join {code[0]}\n```",
                                               colour=3158584)
-                        await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+                        await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
                     else:
-                        return await ctx.send(
+                        return await ctx.author.send(
                             f"{type} is not a valid Team role, only `Manager`, `Member` and `Substitute` is allowed.")
                 else:
-                    return await ctx.send("You are not in a Team or not the Leader of the Team.")
+                    return await ctx.author.send("You are not in a Team or not the Leader of the Team.")
             else:
-                await ctx.send(
+                await ctx.author.send(
                     """You dont have a __verified__, registered Player profile.\n
                     Use: `!register` to register yourself.\n
                     Use: `!me` to check your 'verified'-Status.""")
@@ -347,20 +355,20 @@ class Team:
                                 VALUES (?, ?, ?);""", (result[0], player[0], result[1]))
                             await db.execute("DELETE FROM codes WHERE CodeID = ?;", (data[0],))
                             await db.commit()
-                            return await ctx.send(
+                            return await ctx.author.send(
                                 f"""Code `{code}` successfully redeemed...\n
                                 {ctx.author.mention} joined **{result[2]}** as a *{result[3]}*.""")
                         # code valid! User in Team
                         else:
-                            return await ctx.send("You are already in the Team.")
+                            return await ctx.author.send("You are already in the Team.")
                     else:
-                        return await ctx.send(
+                        return await ctx.author.send(
                             """Only registered players can join teams.\n
                             Use: `!register` to create your player profile.""")
                 else:
-                    return await ctx.send(f"Code `{code}` is invalid.")
+                    return await ctx.author.send(f"Code `{code}` is invalid.")
         else:
-            await ctx.send(f"Code `{code}` is not a proper code (length: 14 characters)")
+            await ctx.author.send(f"Code `{code}` is not a proper code (length: 14 characters)")
 
 
     # claim_team(): async
@@ -417,13 +425,13 @@ class Team:
                             SET RoleID = ?
                             WHERE TeamPlayerID = ?;""", (dict[role.lower()], result[0]))
                         await db.commit()
-                        return await ctx.send(f"{name} became **Team {role.lower().capitalize()}** of the team.")
+                        return await ctx.author.send(f"{name} became **Team {role.lower().capitalize()}** of the team.")
                     else:
-                        return await ctx.send(f"{name} is not a part of the Team.")
+                        return await ctx.author.send(f"{name} is not a part of the Team.")
                 else:
-                    return await ctx.send("You are not a Team Leader.")
+                    return await ctx.author.send("You are not a Team Leader.")
         else:
-            await ctx.send(f"{role} is not a valid Team role, only `Manager`, `Member` and `Substitute` is allowed.")
+            await ctx.author.send(f"{role} is not a valid Team role, only `Manager`, `Member` and `Substitute` is allowed.")
 
 
     # set_teamdata(): async
@@ -463,7 +471,7 @@ class Team:
                              LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
                              WHERE player.Name = ? AND teamplayer.RoleID = 2);""", (ctx.author.name,))
                 await db.commit()
-            await ctx.send(f"Your Team-Data '{subject}' got set to `{data}`")
+            await ctx.author.send(f"Your Team-Data '{subject}' got set to `{data}`")
 
 
     # leave_team(): async
@@ -478,7 +486,7 @@ class Team:
                      FROM player
                      WHERE player.Name = ?);""", (ctx.author.name,))
             await db.commit()
-        await ctx.send("You have successfully left the team.")
+        await ctx.author.send("You have successfully left the team.")
 
 
     # disband_team(): async
@@ -544,7 +552,6 @@ class Team:
         embed.set_footer(text='--- Team-ID: #3 --- || --- Registered: 2018-12-04 --- || --- Status: verified ---')
         embed.add_field(name='Team Roster', value='`Leader    :` [Piratenhut](http://google.de)\n`Member(s) :` [DerAndreas](http://google.de)\n`Substitute:` [Equindar](http://google.de)', inline = True)
         embed.add_field(name='Performance', value='**--- 2570 pts ---**\n100% Winrate\n*2 Matches played*', inline = True)
-        embed.add_field(name='Achievements', value='🥇 `1st Place: aXe-Mas 2018 Tournament`', inline = True)
         await ctx.send(content='used Feature: NorthgardBattle `' + ctx.message.content + '`', embed=embed)
 
 

@@ -41,9 +41,9 @@ class Player:
                          FROM player
                          WHERE Name = ?);""", (str(ctx.author.id), ctx.author.name))
                 await db.commit()
-                return await ctx.send(f"{ctx.author.mention} got sucessfully registered. Welcome!")
+                return await ctx.author.send(f"{ctx.author.mention} got sucessfully registered. Welcome!")
             else:
-                await ctx.send("You are already registered. Use `!me` to check your profile")
+                await ctx.author.send("You are already registered. Use `!me` to check your profile")
 
 
     # player(): async
@@ -95,7 +95,7 @@ class Player:
         if result is not None:
             # data manipulation: db result (tuple)
             if result[4] is None:
-                desc = "use `!player add description [text]` to add your description..."
+                desc = "no player description yet..."
             else:
                 desc = result[4]
             if result[7] is None:
@@ -112,9 +112,9 @@ class Player:
             embed.add_field(name="Team", value=team, inline=True)
             embed.add_field(name="Performance", value=f"**--- {result[3]} pts ---**", inline=True)
             embed.add_field(name="Achievements", value=achievement, inline=True)
-            await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+            await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
         else:
-            await ctx.send(f"Player not found: '{name}'")
+            await ctx.author.send(f"Player not found: '{name}'")
 
 
     # list_players(): async
@@ -132,7 +132,7 @@ class Player:
                 stati = ""
                 async for result in cursor:
                     # data manipulation: db result (tuple)
-                    players += f"`#{result[0]}` {result[1]} \u200b \u200b \u200b\n"
+                    players += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
                     points += f"{result[2]} pts \u200b \n"
                     stati += f"{result[3]}\n"
         # generate embed
@@ -147,7 +147,7 @@ class Player:
             embed.add_field(name="Player", value=players, inline=True)
             embed.add_field(name="Points", value=points, inline=True)
             embed.add_field(name="Status", value=stati, inline=True)
-        await ctx.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+        await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
 
 
     # add_player(): async
@@ -166,13 +166,28 @@ class Player:
 
     # verify_player(): async
     @player.command(name="verify", hidden=True)
+    @commands.has_role(519421170517540864)
     async def verify_player(self, ctx, *, name: str):
         """verify a Player"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
-            await db.execute("UPDATE player SET StatusID = 2 WHERE name = ?;", (name,))
-            await db.commit()
-        await ctx.author.send(f"Player '{name}' got verified.")
-
+            cursor = await db.execute("""
+                SELECT discord.InternalID
+                FROM player
+                LEFT JOIN discord ON discord.ReferenceID = player.PlayerID
+                WHERE discord.Reference = "Player" AND player.Name = ?;""", (name,))
+            player = await cursor.fetchone()
+            await cursor.close()
+            if player is not None:
+                await db.execute("UPDATE player SET StatusID = 2 WHERE name = ?;", (name,))
+                await db.commit()
+                desc = f"Your Player profile **{name}** got verified by {ctx.author.name}"
+                embed = discord.Embed(description=desc,
+                    colour=discord.Colour.green(), timestamp = datetime.now())
+                embed.set_footer(text="--- NorthgardBattle: Player Notification --- ||")
+                await self.bot.get_guild(self.bot.northgardbattle).get_member(player[0]).send(embed=embed)
+                await ctx.author.send(f"Player '{name}' got verified.")
+            else:
+                await ctx.author.send(f"Player '{name}' not found.")
 
     # delete_player(): async
     @player.command(name="delete")
@@ -219,6 +234,8 @@ class Player:
                 if subject.lower() == "steam":
                     if data.startswith("https://steamcommunity.com/"):
                         await db.execute("UPDATE player SET Steam = ? WHERE Name = ?;", (data,ctx.author.name))
+                    else:
+                        return await ctx.author.send("A valid steam profile link starts with: *https://steamcommunity.com/*")
                 elif subject.lower() == "description":
                     await db.execute('UPDATE player SET Description = ? WHERE Name = ?;', (data,ctx.author.name))
                 await db.commit()
