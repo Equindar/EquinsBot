@@ -99,6 +99,57 @@ class Tournament:
             embed.add_field(name="Confirmation", value=back_stati, inline=True)
         await ctx.send(embed=embed)
 
+
+    # preview_tournament(): async
+    @tournament.command(name="preview", hidden=True)
+    async def preview_tournament(self, ctx, *, name: str):
+        """display a Confirmation Preview of a Tournament"""
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            async with db.execute("""
+                SELECT participant.Position, team.Name, team.StatusID, player.Name,
+                    player.StatusID, player.Steam, status.Value
+                FROM team
+                LEFT JOIN teamplayer ON team.TeamID = teamplayer.TeamID
+                LEFT JOIN participant ON participant.TeamID = team.TeamID
+                LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
+                LEFT JOIN status ON participant.StatusID = status.StatusID
+                LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
+                WHERE tournament.Name = ?
+                ORDER BY participant.Position ASC;""", (name,)) as cursor:
+
+                part_team = ""
+                part_preview = ""
+                back_team = ""
+                back_preview = ""
+                counter = 0
+                async for result in cursor:
+                    # data manipulation: db result (tuple)
+                    if counter < 16:
+                        part_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
+                        if
+                    else:
+                        back_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
+                        back_preview += f"{result[5]}\n"
+                    counter += 1
+        # generate embed
+        embed = discord.Embed(title=f"__{name}__",
+                              description=f"List of all joined Teams",
+                              colour=discord.Colour.dark_red(),
+                              timestamp = datetime.now())
+        embed.set_footer(text="--- List: sorted by Position --- ||")
+        if not part_team:
+            embed.add_field(name="Participants", value="no teams listed here.", inline=False)
+        else:
+            embed.add_field(name="`Pos` Participants", value=part_team, inline=True)
+            embed.add_field(name="Prediction (Confirmation)", value=part_stati, inline=True)
+        if not back_team:
+            embed.add_field(name="Backup-Queue", value="no teams listed here.", inline=False)
+        else:
+            embed.add_field(name="`Pos` Backup-Queue", value=back_team, inline=True)
+            embed.add_field(name="Prediction (Confirmation)", value=back_stati, inline=True)
+        await ctx.send(embed=embed)
+
+
     # join_tournament(): async
     @tournament.command(name="join")
     async def join_tournament(self, ctx):
@@ -224,7 +275,37 @@ class Tournament:
         return await server.get_channel(534764595970310145).send(embed=embed)
 
 
-    # join_tournament(): async
+    # confirm_tournament(): async
+    @tournament.command(name="confirm", hidden=True)
+    async def confirm_tournament(self, ctx, *, name: str):
+        async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
+            # check: list active tournament
+            cursor = await db.execute("""
+                SELECT player.PlayerID, team.TeamID, team.Name, teamplayer.RoleID, participant.TournamentID
+                FROM player
+                LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
+                LEFT JOIN team ON team.TeamID = teamplayer.TeamID
+                LEFT JOIN participant ON participant.TeamID = team.TeamID
+                WHERE player.Name = ?;""", (ctx.author.name,))
+            player = await cursor.fetchone()
+            await cursor.close()
+            # check: in Team and Team Leader?
+            if player is not None:
+                if player[1] is not None:
+                    if player[3] == 2:
+                        if player[4] is not None:
+                            pass
+                        else:
+                            return await ctx.author.send("Your Team hasnt joined an active Tournament")
+                    else:
+                        return await ctx.author.send("You are not the Team Leader.")
+                else:
+                    return await ctx.author.send("You are not in a Team.")
+            else:
+                await ctx.author.send("You dont have a registered Player profile.")
+
+
+    # leave_tournament(): async
     @tournament.command(name="leave")
     async def leave_tournament(self, ctx):
         """join an active Tournament"""
