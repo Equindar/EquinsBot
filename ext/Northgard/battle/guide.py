@@ -109,6 +109,7 @@ class Guide:
         embed = discord.Embed(title="__Guide **Basics: Tournament**__",description=desc,colour=3158584)
         embed.set_footer(text="--- EquinsBot --- || --- Guide #4 (\"Basics: Tournament\") --- ")
         embed.add_field(name="How do i let my Team join a Tournament?", value="```Diff\n!tournament join```", inline=False)
+        embed.add_field(name="How can i confirm my Team's Tournament participation?", value="```Diff\n!tournament confirm```", inline=False)
         embed.add_field(name="How can i let my Team leave a Tournament?", value="```!tournament leave```", inline=True)
         embed.add_field(name="More features coming soon...", value="\u200b \u200b", inline=False)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you can deal with tournaments!**\n*Next Step:* `coming soon`")
