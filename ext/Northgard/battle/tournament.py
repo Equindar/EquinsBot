@@ -126,7 +126,6 @@ class Tournament:
                     # data manipulation: db result (tuple)
                     if counter < 16:
                         part_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
-                        if
                     else:
                         back_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
                         back_preview += f"{result[5]}\n"
@@ -218,7 +217,7 @@ class Tournament:
                             await self.team_joined(ctx, pos = counter + 1, team_id = team[0])
                             return await ctx.author.send(
                                 f"""Your Team '{team[1]}' **successfully joined** '{tournament[1]}'
-                                \nYou entered the BackupQueue at Position #{(counter) - limit}""")
+                                \nYou entered the BackupQueue at Position #{(counter + 1) - limit}""")
                 else:
                     await ctx.author.send("""You **cannot join** a tournament.\n
                         \n__Reasons can be:__\nYou are not in a Team.\nYou are not the Team Leader.""")
@@ -277,11 +276,16 @@ class Tournament:
 
     # confirm_tournament(): async
     @tournament.command(name="confirm", hidden=True)
-    async def confirm_tournament(self, ctx, *, name: str):
+    async def confirm_tournament(self, ctx):
+        alerts = {
+            1: "We are so silent? - Yeah, no warcry for unworthy opponents...",
+            2: ""
+        }
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
             # check: list active tournament
             cursor = await db.execute("""
-                SELECT player.PlayerID, team.TeamID, team.Name, teamplayer.RoleID, participant.TournamentID
+                SELECT player.PlayerID, team.TeamID, team.Name, teamplayer.RoleID,
+                    participant.TournamentID, participant.ParticipantID, participant.StatusID
                 FROM player
                 LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
                 LEFT JOIN team ON team.TeamID = teamplayer.TeamID
@@ -294,7 +298,45 @@ class Tournament:
                 if player[1] is not None:
                     if player[3] == 2:
                         if player[4] is not None:
-                            pass
+                            if player[6] != 8:
+                                issues = { }
+                                cursor = await db.execute("""
+                                    SELECT player.Name, player.StatusID, team.Name, team.StatusID
+                                    FROM player
+                                    LEFT JOIN teamplayer ON teamplayer.PlayerID = player.PlayerID
+                                    LEFT JOIN team ON team.TeamID = teamplayer.TeamID
+                                    WHERE team.TeamID = ?""", (player[1],))
+                                team = await cursor.fetchall()
+                                await cursor.close()
+                                counter = 0
+                                print(team)
+                                for member in team:
+                                    print(member)
+                                    if member[1] != 2:
+                                        issues[f"Member '{member[0]}'"] = "not verified"
+                                    counter += 1
+                                if team[0][3] != 2:
+                                    issues[f"Team '{team[0][2]}'"] = "not verified"
+
+                                if not issues and counter >= 2:
+                                    await db.execute("""
+                                        UPDATE participant
+                                        SET StatusID = 8
+                                        WHERE ParticipantID = ?""", (player[5],))
+                                    await db.commit()
+                                    await ctx.author.send("You have **successfully confirmed** your Team.")
+                                    desc = f"`✔️` Team **{player[2]}** confirmed its Tournament participation."
+                                    embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
+                                    embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+                                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(534764595970310145).send(embed=embed)
+
+                                else:
+                                    output = ""
+                                    for k, v in issues.items():
+                                        output += f"{k}: {v}\n"
+                                    return await ctx.author.send(f"You **cannot complete** the Team Confirmation.\n__Issues:__\n{output}")
+                            else:
+                                return await ctx.author.send("You already confirmed your Team.")
                         else:
                             return await ctx.author.send("Your Team hasnt joined an active Tournament")
                     else:
@@ -409,7 +451,7 @@ class Tournament:
                 x += emoji[int(c)]
             else:
                 x += c
-        embed = discord.Embed(colour=3158584, timestamp = date)
+        embed = discord.Embed(colour=3158584, timestamp = date - timedelta(hours=1))
         embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
         await ctx.send(content="The sands are running out, @everyone", embed=embed)
@@ -443,7 +485,7 @@ class Tournament:
                 x += emoji[int(c)]
             else:
                 x += c
-        embed = discord.Embed(colour=3158584, timestamp = date)
+        embed = discord.Embed(colour=3158584, timestamp = date - timedelta(hours=1))
         embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
         await ctx.send(embed=embed)
