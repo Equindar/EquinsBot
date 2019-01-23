@@ -14,7 +14,7 @@ extensions = ['ext.system',
              ]
 # initialize the bot
 bot = commands.Bot(command_prefix='!', description="A universal Discord Bot by Equindar")
-bot.log = 521619613708976135
+bot.log = 537576497876041729
 
 # --- main
 if __name__ == '__main__':
