@@ -126,9 +126,9 @@ class Blueprint:
         embed.add_field(name="__Start:__", value="```2019-01-26 (Sat.)\n12:00 pm CET```", inline=True)
         embed.add_field(name="__Prize: (team based)__", value="```1st Place: 120 €```", inline=True)
         embed.add_field(name="\u200b \u200b", value="\u200b \u200b", inline=True)
-        embed.add_field(name="Registration:", value=server.get_channel(534764595970310145).mention, inline=True)
-        embed.add_field(name="Bracket:", value=server.get_channel(532526879362777088).mention, inline=True)
-        embed.add_field(name="Match-Results:", value=server.get_channel(519185737573335050).mention, inline=True)
+        embed.add_field(name="Registration:", value=server.get_channel(537581556202733568).mention, inline=True)
+        embed.add_field(name="Bracket:", value=server.get_channel(537580627105415168).mention, inline=True)
+        embed.add_field(name="Match-Results:", value=server.get_channel(537580628736999434).mention, inline=True)
         return await ctx.send(embed=embed)
 
 
@@ -188,7 +188,7 @@ class Blueprint:
                 ```!guide player```Or take the Crash Course (the "TLDR" Guide):
                 ```!crash-course```""")
         embed.add_field(name="Problems with `!commands`?", value=f"*If you have issues, feel free to contact {self.bot.get_guild(self.bot.northgardbattle).get_member(362347317724184580).mention} for help.*")
-        embed.add_field(name="Questions?", value=f"*Post your question on {self.bot.get_guild(self.bot.northgardbattle).get_channel(532526880113295361).mention} or contact {self.bot.get_guild(self.bot.northgardbattle).get_role(509005550948974603).mention} / {self.bot.get_guild(self.bot.northgardbattle).get_role(519434488225333269).mention}.*")
+        embed.add_field(name="Questions?", value=f"*Post your question on {self.bot.get_guild(self.bot.northgardbattle).get_channel(537580627537559554).mention} or contact {self.bot.get_guild(self.bot.northgardbattle).get_role(509005550948974603).mention} / {self.bot.get_guild(self.bot.northgardbattle).get_role(519434488225333269).mention}.*")
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
         return await ctx.send(embed=embed)
