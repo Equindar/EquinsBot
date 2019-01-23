@@ -255,7 +255,7 @@ class Tournament:
                     else:
                         if server.get_role(self.backQueue) not in member.roles:
                             await member.add_roles(server.get_role(self.backQueue))
-        for item in  server.categories:
+        for item in server.categories:
             if item.id == 519174714002898984:
                 category = item
         perms = {   team: discord.PermissionOverwrite(read_messages=True, connect=True, speak=True),
@@ -271,7 +271,7 @@ class Tournament:
             desc = f"`✔️` Team **{result[3]}** joined the Tournament\nIt got set to the BackupQueue (Position: #{pos-16})."
         embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
         embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
-        return await server.get_channel(534764595970310145).send(embed=embed)
+        return await server.get_channel(537581556202733568).send(embed=embed)
 
 
     # confirm_tournament(): async
@@ -328,7 +328,7 @@ class Tournament:
                                     desc = f"`✔️` Team **{player[2]}** confirmed its Tournament participation."
                                     embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
                                     embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
-                                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(534764595970310145).send(embed=embed)
+                                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
 
                                 else:
                                     output = ""
@@ -380,7 +380,7 @@ class Tournament:
                     desc = f"`❌` Team **{participant[1]}** left the Tournament."
                     embed = discord.Embed(description=desc,colour=discord.Colour.red(), timestamp = datetime.now())
                     embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
-                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(534764595970310145).send(embed=embed)
+                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
             else:
                 await ctx.author.send("""You **cannot leave** the tournament.
                     \n__Reasons can be:__\nYou are not in a Tournament.\nYou are not the Team Leader.""")
