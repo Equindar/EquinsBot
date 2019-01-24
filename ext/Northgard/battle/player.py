@@ -106,8 +106,11 @@ class Player:
                 steam = ""
             else:
                 steam = result[2]
+
+            player = self.bot.get_guild(self.bot.northgardbattle).get_member(result[8])
             embed = discord.Embed(title=f"__{result[1]}__",description=desc,colour=6809006,url=steam)
-            embed.set_thumbnail(url = self.bot.get_guild(self.bot.northgardbattle).get_member(result[8]).avatar_url_as(format='png', size=512))
+            if player is not None:
+                embed.set_thumbnail(url = player.avatar_url_as(format='png', size=512))
             embed.set_footer(text=f"--- Player-ID: #{result[0]} --- || --- Registered: {result[5][:-7]} --- || --- Status: {result[6]} ---")
             embed.add_field(name="Team", value=team, inline=True)
             embed.add_field(name="Performance", value=f"**--- {result[3]} pts ---**", inline=True)
