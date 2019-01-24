@@ -29,6 +29,24 @@ class Blueprint:
             await ctx.send("No param...")
 
 
+    # confirmation(): async
+    @blueprint.command()
+    async def confirmation(self, ctx):
+        """Confirmation Blueprint"""
+        desc = """Ahoiiii Warchiefs!
+            \nWe have 16 teams! Enjoy your time under siege sharpening your strategys.
+            Come saturday, its WAR!
+            *Check your schedule and make sure you can play on saturday.*"""
+        embed = discord.Embed(title="__Confirmation Phase__",description=desc,
+            colour=discord.Colour.dark_red(), timestamp = datetime.now())
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url_as(format='png', size=512))
+        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
+        embed.add_field(name="Perform the following command to confirm:", value="```Diff\n!tournament confirm\n``` \u200b \u200b\u200b \u200b\u200b \u200b\u200b \u200b `⚠️` Only the Team Leader can confirm the Team participation.\n\u200b \u200b", inline=False)
+        embed.add_field(name="Confirmation ends:", value="**2019-01-25 **(Fri.)\n**12:00 pm CET**", inline=True)
+        embed.add_field(name="Bracket Announcement:", value="**2019-01-25 **(Fri.)\n**2:00 pm CET**", inline=True)
+        return await ctx.send(embed=embed)
+
+
     # lobby(): async
     @blueprint.command()
     async def lobby(self, ctx):
@@ -39,6 +57,7 @@ class Blueprint:
             "Players":              "Team 2 vs 2",
             "Game Server":          "Europe",
             "Difficulty":           "High (not Extreme)",
+            "Map Size":             "Medium",
             "Map Generation":       "Balanced",
             "Game Mode":            "Ragnarok",
             "Victory Conditions":   "All"
