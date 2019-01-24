@@ -30,7 +30,7 @@ class Errors:
             return
 
         # Ignore-List procedure
-        ignored = (commands.CommandNotFound, commands.UserInputError)
+        ignored = (commands.UserInputError)
         error = getattr(error, 'original', error)
         if isinstance(error, ignored):
             return
@@ -38,6 +38,9 @@ class Errors:
         # DisabledCommand procedure
         elif isinstance(error, commands.DisabledCommand):
             return await ctx.send(f"{ctx.command} has been disabled.")
+
+        elif isinstance(error, commands.CommandNotFound):
+            return await ctx.message.add_reaction('❓')
 
         elif isinstance(error, commands.NoPrivateMessage):
             try:
