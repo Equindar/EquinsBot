@@ -71,10 +71,22 @@ class Tournament:
                 async for result in cursor:
                     # data manipulation: db result (tuple)
                     if counter < 16:
+                        if result[5] == 'confirmed':
+                            part_stati += "`✔️` "
+                        elif result[5] == 'failed':
+                            part_stati += "`❌` "
+                        else:
+                            part_stati += "\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b"
                         part_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
                         part_pts += f"{result[2]} pts \u200b \n"
                         part_stati += f"{result[5]}\n"
                     else:
+                        if result[5] == 'confirmed':
+                            back_stati += "`✔️` "
+                        elif result[5] == 'failed':
+                            back_stati += "`❌` "
+                        else:
+                            back_stati += "\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b"
                         back_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
                         back_pts += f"{result[2]} pts \u200b \n"
                         back_stati += f"{result[5]}\n"
@@ -102,50 +114,44 @@ class Tournament:
 
     # preview_tournament(): async
     @tournament.command(name="preview", hidden=True)
-    async def preview_tournament(self, ctx, *, name: str):
+    async def preview_tournament(self, ctx):
         """display a Confirmation Preview of a Tournament"""
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
             async with db.execute("""
-                SELECT participant.Position, team.Name, team.StatusID, player.Name,
-                    player.StatusID, player.Steam, status.Value
+                SELECT participant.Position, team.Name, teamplayer.RoleID, player.Name, player.Steam
                 FROM team
                 LEFT JOIN teamplayer ON team.TeamID = teamplayer.TeamID
                 LEFT JOIN participant ON participant.TeamID = team.TeamID
                 LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
                 LEFT JOIN status ON participant.StatusID = status.StatusID
                 LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
-                WHERE tournament.Name = ?
-                ORDER BY participant.Position ASC;""", (name,)) as cursor:
+                WHERE tournament.TournamentID = 2 AND participant.StatusID = 8
+                ORDER BY participant.Position ASC;""") as cursor:
 
-                part_team = ""
-                part_preview = ""
-                back_team = ""
-                back_preview = ""
+                team = { }
+                members = ""
                 counter = 0
+                output = []
                 async for result in cursor:
-                    # data manipulation: db result (tuple)
-                    if counter < 16:
-                        part_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
-                    else:
-                        back_team += f"`#{result[0]:>2}` {result[1]} \u200b \u200b \u200b\n"
-                        back_preview += f"{result[5]}\n"
-                    counter += 1
+                    if result[1] not in team.keys():
+                        team[result[1]] = []
+                    if result[2] == 2:
+                        member= f"Leader: *{result[3]}*"
+                    if result[2] == 3:
+                        member = f"Member: {result[3]}"
+                    if result[2] == 4:
+                        member = f"Substitute: {result[3]}"
+                    team[result[1]].append(member)
+
         # generate embed
-        embed = discord.Embed(title=f"__{name}__",
-                              description=f"List of all joined Teams",
+        embed = discord.Embed(title=f"__Details: **Bloody January 2019**__",
+                              description=f"All Participants of Bloody January 2019",
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
-        embed.set_footer(text="--- List: sorted by Position --- ||")
-        if not part_team:
-            embed.add_field(name="Participants", value="no teams listed here.", inline=False)
-        else:
-            embed.add_field(name="`Pos` Participants", value=part_team, inline=True)
-            embed.add_field(name="Prediction (Confirmation)", value=part_stati, inline=True)
-        if not back_team:
-            embed.add_field(name="Backup-Queue", value="no teams listed here.", inline=False)
-        else:
-            embed.add_field(name="`Pos` Backup-Queue", value=back_team, inline=True)
-            embed.add_field(name="Prediction (Confirmation)", value=back_stati, inline=True)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url_as(format='png', size=512))
+        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
+        for k, v in team.items():
+            embed.add_field(name=k, value="\n".join(v), inline=True)
         await ctx.send(embed=embed)
 
 
@@ -276,6 +282,7 @@ class Tournament:
 
     # confirm_tournament(): async
     @tournament.command(name="confirm", hidden=True)
+    @commands.is_owner()
     async def confirm_tournament(self, ctx):
         alerts = {
             1: "We are so silent? - Yeah, no warcry for unworthy opponents...",
@@ -454,7 +461,7 @@ class Tournament:
         embed = discord.Embed(colour=3158584, timestamp = date - timedelta(hours=1))
         embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
-        await ctx.send(content="The sands are running out, @everyone", embed=embed)
+        await ctx.send(content="Last Minute Tournament Check in? @everyone", embed=embed)
 
 
     # deadline(): async

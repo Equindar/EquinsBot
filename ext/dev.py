@@ -114,7 +114,10 @@ class DEV:
     @commands.is_owner()
     async def test(self, ctx):
         """DEV function !test for testing"""
-        await ctx.send(f"ID: {ctx.channel.id}")
+        desc = f"`❗` Confirmation Phase is over.\nTeam participation confirmations got locked..."
+        embed = discord.Embed(description=desc,colour=discord.Colour.red(), timestamp = datetime.now())
+        embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+        return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
 
 #        for member in ctx.guild.members:
 #            if member.bot:
