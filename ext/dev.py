@@ -114,10 +114,18 @@ class DEV:
     @commands.is_owner()
     async def test(self, ctx):
         """DEV function !test for testing"""
-        desc = f"`❗` Confirmation Phase is over.\nTeam participation confirmations got locked..."
-        embed = discord.Embed(description=desc,colour=discord.Colour.red(), timestamp = datetime.now())
-        embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
-        return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
+
+        # init
+        server = self.bot.get_guild(self.bot.northgardbattle)
+        for item in server.categories:
+            if item.id == 519174714002898984:
+                category = item
+        print(category.name)
+
+#        desc = f"`❗` Confirmation Phase is over.\nTeam participation confirmations got locked..."
+#        embed = discord.Embed(description=desc,colour=discord.Colour.red(), timestamp = datetime.now())
+#        embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+#        return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
 
 #        for member in ctx.guild.members:
 #            if member.bot:
@@ -178,6 +186,20 @@ class DEV:
                         }
                         team_ch = await server.create_voice_channel(f"[#{result[1]}] {result[2]}", category=category, overwrites=perms)
 
+
+    # recover_team_channels(): async
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    @commands.guild_only()
+    async def delete_team_channels(self, ctx):
+        # init
+        server = self.bot.get_guild(self.bot.northgardbattle)
+        for item in server.categories:
+            if item.id == 519174714002898984:
+                category = item
+        for channel in category.channels:
+            await channel.delete()
+            await ctx.send(f"Channel {channel.name} deleted.")
 
 
 
