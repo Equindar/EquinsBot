@@ -81,7 +81,8 @@ class Player:
                     FROM player
                     LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID
                     LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID
-                    WHERE player.PlayerID = ?;""", (result[0],))
+                    WHERE player.PlayerID = ?
+                    ORDER BY achievements.`Order` ASC;""", (result[0],))
                 achievements = await cursor.fetchall()
                 await cursor.close()
                 for item in achievements:
