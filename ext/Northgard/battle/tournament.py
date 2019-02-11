@@ -459,7 +459,7 @@ class Tournament:
             else:
                 x += c
         embed = discord.Embed(colour=3158584, timestamp = date - timedelta(hours=1))
-        embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
+        embed.add_field(name='Tournament: **Bloody February 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
         await ctx.send(content="Last Minute Tournament Check in? @everyone", embed=embed)
 
@@ -473,7 +473,7 @@ class Tournament:
             5:":five:", 6:":six:", 7:":seven:", 8:":eight:", 9:":nine:"
         }
         now = datetime.now()
-        date = datetime(2019,1,26,12,0,0)
+        date = datetime(2019,2,23,12,0,0)
         # create dict
         td = date - now
         if td.total_seconds() < 0:
@@ -493,7 +493,7 @@ class Tournament:
             else:
                 x += c
         embed = discord.Embed(colour=3158584, timestamp = date - timedelta(hours=1))
-        embed.add_field(name='Tournament: **Bloody January 2019** starting in...',
+        embed.add_field(name='Tournament: **Bloody February 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
         await ctx.send(embed=embed)
 
@@ -518,6 +518,7 @@ class Tournament:
         ow_results = {
             ctx.guild.get_role(self.leader): discord.PermissionOverwrite(attach_files=True)
         }
+        ow_lft =
 
         # create category
         category = await ctx.guild.create_category_channel(f"[{name}]", overwrites=ow_category)
@@ -525,10 +526,12 @@ class Tournament:
         # create channels
         ch_info     = await ctx.guild.create_text_channel("Information", category=category)
         ch_bracket  = await ctx.guild.create_text_channel("Bracket", category=category, overwrites=ow_bracket)
+        ch_lft      = await ctx.guild.create_text_channel("Looking for Team", category=category)
         ch_question = await ctx.guild.create_text_channel("Questions", category=category)
         ch_results  = await ctx.guild.create_text_channel("Match Results", category=category)
         # set channel perms
         await ch_info.set_permissions(ow_info)
+        await ch_lft.set_permissions({ ctx.guild.default_role: discord.PermissionOverwrite(read_messages=True) })
         await ctx.author.send("Tournament got set up.")
 
 

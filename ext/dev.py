@@ -254,31 +254,31 @@ class DEV:
                         rec_sub.append(member.name)
                         await member.add_roles(team_sub)
 
-                if participant not in member.roles:
-                    if users[member.id][4] == 1:
-                        rec_part.append(member.name)
-                        await member.add_roles(participant)
-                        for item in server.roles:
-                            if f"Team: {users[member.id][3]}" == item.name:
-                                team = item
-                                rec_team.append(member.name)
-                                await member.add_roles(team)
-                                break
+#                if participant not in member.roles:
+#                    if users[member.id][4] == 1:
+#                        rec_part.append(member.name)
+#                        await member.add_roles(participant)
+#                        for item in server.roles:
+#                            if f"Team: {users[member.id][3]}" == item.name:
+#                                team = item
+#                                rec_team.append(member.name)
+#                                await member.add_roles(team)
+#                                break
+#
+#                if backQueue not in member.roles:
+#                    if users[member.id][4] == 2:
+#                        rec_back.append(member.name)
+#                        await member.add_roles(backQueue)
+#                        for item in server.roles:
+#                            if f"Team: {users[member.id][3]}" == item.name:
+#                                team = item
+#                                rec_team.append(member.name)
+#                                await member.add_roles(team)
+#                                break
 
-                if backQueue not in member.roles:
-                    if users[member.id][4] == 2:
-                        rec_back.append(member.name)
-                        await member.add_roles(backQueue)
-                        for item in server.roles:
-                            if f"Team: {users[member.id][3]}" == item.name:
-                                team = item
-                                rec_team.append(member.name)
-                                await member.add_roles(team)
-                                break
-
-        desc = f"`✔️` The following Users got their Roles recovered:"
-        embed = discord.Embed(title = "__Role Recovery from Database__", description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
-        embed.set_footer(text="--- EquinsBot --- || --- Data Recovery --- ||")
+        desc = f"`✔️` The following Users got their Roles updated:"
+        embed = discord.Embed(title = "__Role Update from Database__", description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
+        embed.set_footer(text="--- EquinsBot --- || --- Role Update --- ||")
         if len(rec_leader) != 0:
             embed.add_field(name=f"Role: Team Leader ({len(rec_leader)})", value=", ".join(rec_leader), inline=False)
         if len(rec_member) != 0:
@@ -291,7 +291,7 @@ class DEV:
             embed.add_field(name=f"Role: BackupQueue ({len(rec_back)})", value=", ".join(rec_back), inline=False)
         if len(rec_team) != 0:
             embed.add_field(name=f"Team Roles ({len(rec_team)})", value=", ".join(rec_team), inline=False)
-        return await server.get_channel(537553412041080833).send(embed=embed)
+        return await server.get_channel(537579586985263104).send(embed=embed)
 
 
 #        member = ctx.guild.get_member(ctx.message.author.id)
