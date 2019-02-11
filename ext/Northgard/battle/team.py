@@ -90,12 +90,12 @@ class Team:
                     desc = team[0][1]
 
                 embed = discord.Embed(title=f"__{team[0][0]}__",description=desc,colour=6809006)
-                embed.set_thumbnail(url = "https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/d/d4/Tactician_icon.png")
+                embed.set_thumbnail(url = "https://gamepedia.cursecdn.com/northgard_gamepedia_en/d/d4/Tactician_icon.png")
                 embed.set_footer(text=f"--- Team-ID: #{team[0][6]} --- || --- Registered: {team[0][7][:-7]} --- || --- Status: {team[0][8]} ---")
                 embed.add_field(name="Team Roster", value=roster, inline=True)
                 embed.add_field(name="Performance", value='**--- %.2f pts ---**' % (points / members), inline=True)
                 # Match History: `W 📈 +10 pts` -vs- `Team: Frostbite`\n`L 📉 -14 pts` -vs- `Team: Set in Stone`\n`W 📈 + 8 pts` -vs- `Team: Pinar`\n`W 📈 +24 pts` -vs- `Team: chip n dale`
-                embed.add_field(name="Match History (latest 5)", value="feature coming soon...", inline=True)
+                embed.add_field(name="Match History (latest 5)", value="feature coming soon...", inline=False)
                 return await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
             else:
                 await ctx.author.send(f"Team '{name}' not found.")
@@ -168,7 +168,7 @@ class Team:
             await cursor.close()
             # check: is player registered?
             if player is not None:
-                # check: has no Team?
+                # check: has no team?
                 if player[2] == None:
                     # check: is verified player?
                     if player[1] == 2:

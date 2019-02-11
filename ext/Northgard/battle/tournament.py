@@ -518,7 +518,6 @@ class Tournament:
         ow_results = {
             ctx.guild.get_role(self.leader): discord.PermissionOverwrite(attach_files=True)
         }
-        ow_lft =
 
         # create category
         category = await ctx.guild.create_category_channel(f"[{name}]", overwrites=ow_category)

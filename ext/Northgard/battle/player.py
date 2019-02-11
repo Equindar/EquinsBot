@@ -115,7 +115,7 @@ class Player:
             embed.set_footer(text=f"--- Player-ID: #{result[0]} --- || --- Registered: {result[5][:-7]} --- || --- Status: {result[6]} ---")
             embed.add_field(name="Team", value=team, inline=True)
             embed.add_field(name="Performance", value=f"**--- {result[3]} pts ---**", inline=True)
-            embed.add_field(name="Achievements", value=achievement, inline=True)
+            embed.add_field(name="Achievements", value=achievement, inline=False)
             await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
         else:
             await ctx.author.send(f"Player not found: '{name}'")
