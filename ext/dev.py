@@ -62,7 +62,11 @@ class DEV:
         name = ""
         id = ""
         for item in ctx.guild.categories:
-            name += f"`#{item.position}` {item.name} \u200b \u200b \u200b\n"
+            if len(item.name) > 25:
+                cat = item.name[0:24] + "[...]"
+            else:
+                cat = item.name
+            name += f"`#{item.position}` {cat} \u200b \u200b \u200b\n"
             id += f"{item.id}\n"
         embed = discord.Embed(title=f"__{ctx.guild.name}__",colour=3158584)
         embed.set_footer(text="--- Category information ---")
@@ -78,13 +82,17 @@ class DEV:
         name = ""
         id = ""
         for item in ctx.guild.channels:
+            if len(item.name) > 25:
+                ch = item.name[0:24] + "[...]"
+            else:
+                ch = item.name
             if type == "text":
                 if isinstance(item, discord.TextChannel):
-                    name += f"`#{item.position}` {item.name} \u200b \u200b \u200b\n"
+                    name += f"`#{item.position}` {ch} \u200b \u200b \u200b\n"
                     id += f"{item.id}\n"
             else:
                 if isinstance(item, discord.VoiceChannel):
-                    name += f"`#{item.position}` {item.name} \u200b \u200b \u200b\n"
+                    name += f"`#{item.position}` {ch} \u200b \u200b \u200b\n"
                     id += f"{item.id}\n"
         embed = discord.Embed(title=f"__{ctx.guild.name}__",colour=3158584)
         embed.set_footer(text="--- Channel information ---")
@@ -100,7 +108,11 @@ class DEV:
         name = ""
         id = ""
         for item in ctx.guild.roles:
-            name += "{} \u200b \u200b \u200b\n".format(item.name.replace("@","\@"))
+            if len(item.name) > 25:
+                role = item.name[0:24] + "[...]"
+            else:
+                role = item.name
+            name += "{} \u200b \u200b \u200b\n".format(role.replace("@","\@"))
             id += f"{item.id}\n"
         embed = discord.Embed(title=f"__{ctx.guild.name}__",colour=3158584)
         embed.set_footer(text="--- Role information ---")

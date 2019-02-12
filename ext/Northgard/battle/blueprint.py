@@ -84,31 +84,32 @@ class Blueprint:
     async def announcement(self, ctx):
         """Announcement Blueprint"""
 
-        embed = discord.Embed(title="__Announcement: **Bloody January 2019**__",description="""
+        embed = discord.Embed(title="__Announcement: **Bloody February 2019**__",description="""
             Ahoi Warchief's
-            *Its again time to be victorious for the first time im 2019.
-            Compete with your team in our `Bloody January 2019` tournament and face 15 other teams.
+            *Sharpen your axes and let the ground get soaked in blood for glory, for Valhalla, for ODIN!
+            Compete with your team in our `Bloody February 2019` tournament and face 15 other teams.
             Train, fight, win...*
             ~ NorthgardBattle Staff
             \n```\"Grab your strongest brother in arms and sign up to fight until you're the last one standing\"\n\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b~Weihn8smann```
-            For more information check out the NorthgardBattle Discord server:
-            https://discord.gg/aBFNP27""",
+            """,
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_image(url="https://i.imgur.com/AMxwdFU.png")
-        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
-        embed.add_field(name="Start", value="**2019-01-26 **(Sat.)\n**12:00 pm CET**", inline=True)
-        embed.add_field(name="Prize (team based)", value="**1st Place: 120€**", inline=True)
+        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
+        embed.add_field(name="Start", value="**2019-02-23 **(Sat.)\n**12:00 pm CET**", inline=True)
+        embed.add_field(name="Prize (team based)", value="**1st Place: 80€\n2nd Place: 40€**", inline=True)
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
         embed.add_field(name="Match-Ups", value="2 vs 2", inline=True)
-        return await ctx.send(content="*NorthgardBattle is hosting a new Tournament*, @everyone", embed=embed)
+        embed.add_field(name="Map-Details", value="`Mode:` Ragnarok\u200b \u200b \u200b `Difficulty:` High\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b `Win Conditions:` All\n`Size:` Medium\u200b \u200b \u200b \u200b \u200b \u200b`Generation:` Balanced", inline=False)
+        await ctx.send(content="*NorthgardBattle is hosting a new tournament*, @everyone", embed=embed)
+        return await ctx.send("**For more information check out the NorthgardBattle Discord server:**\nhttps://discord.gg/tbcZcjG")
 
 
     # news(): async
     @blueprint.command()
     async def news(self, ctx):
-        """Announcement Blueprint"""
+        """News Blueprint"""
 
         embed = discord.Embed(title="__Announcement: **Bloody February 2019**__",description="""
             Ahoi Warchief's,
