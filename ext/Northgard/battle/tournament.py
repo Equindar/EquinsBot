@@ -125,7 +125,7 @@ class Tournament:
                 LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
                 LEFT JOIN status ON participant.StatusID = status.StatusID
                 LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
-                WHERE tournament.TournamentID = 2 AND participant.StatusID = 8
+                WHERE tournament.TournamentID = 3 AND participant.StatusID = 8
                 ORDER BY participant.Position ASC;""") as cursor:
 
                 team = { }
@@ -144,12 +144,12 @@ class Tournament:
                     team[result[1]].append(member)
 
         # generate embed
-        embed = discord.Embed(title=f"__Details: **Bloody January 2019**__",
-                              description=f"All Participants of Bloody January 2019",
+        embed = discord.Embed(title=f"__Details: **Bloody February 2019**__",
+                              description=f"List of all Participants",
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url_as(format='png', size=512))
-        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
+        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
         for k, v in team.items():
             embed.add_field(name=k, value="\n".join(v), inline=True)
         await ctx.send(embed=embed)
@@ -276,7 +276,7 @@ class Tournament:
         else:
             desc = f"`✔️` Team **{result[3]}** joined the Tournament\nIt got set to the BackupQueue (Position: #{pos-16})."
         embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
-        embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+        embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
         return await server.get_channel(537581556202733568).send(embed=embed)
 
 
@@ -334,7 +334,7 @@ class Tournament:
                                     await ctx.author.send("You have **successfully confirmed** your Team.")
                                     desc = f"`✔️` Team **{player[2]}** confirmed its Tournament participation."
                                     embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
-                                    embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+                                    embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
                                     return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
 
                                 else:
@@ -386,7 +386,7 @@ class Tournament:
                     await ctx.author.send(f"Your Team '{participant[1]}' **successfully left** the Tournament.")
                     desc = f"`❌` Team **{participant[1]}** left the Tournament."
                     embed = discord.Embed(description=desc,colour=discord.Colour.red(), timestamp = datetime.now())
-                    embed.set_footer(text="--- Tournament: Bloody January 2019 --- ||")
+                    embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
                     return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
             else:
                 await ctx.author.send("""You **cannot leave** the tournament.
