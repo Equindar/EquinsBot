@@ -58,7 +58,7 @@ class Team:
                 LEFT JOIN role ON role.RoleID = teamplayer.RoleID
                 LEFT JOIN player ON teamplayer.PlayerID = player.PlayerID
                 LEFT JOIN status ON status.StatusID = team.StatusID
-                WHERE team.name = ?
+                WHERE team.name = ? AND team.`D-Flag` IS NULL
                 ORDER BY role.RoleID ASC;""", (name,))
             team = await cursor.fetchall()
             await cursor.close()
@@ -96,7 +96,7 @@ class Team:
                 embed.add_field(name="Performance", value='**--- %.2f pts ---**' % (points / members), inline=True)
                 # Match History: `W 📈 +10 pts` -vs- `Team: Frostbite`\n`L 📉 -14 pts` -vs- `Team: Set in Stone`\n`W 📈 + 8 pts` -vs- `Team: Pinar`\n`W 📈 +24 pts` -vs- `Team: chip n dale`
                 embed.add_field(name="Match History (latest 5)", value="feature coming soon...", inline=False)
-                return await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+                return await ctx.author.send(embed=embed)
             else:
                 await ctx.author.send(f"Team '{name}' not found.")
 
@@ -118,7 +118,7 @@ class Team:
                 LEFT JOIN role ON role.RoleID = teamplayer.RoleID
                 LEFT JOIN player ON teamplayer.PlayerID = player.PlayerID
                 LEFT JOIN status ON status.StatusID = team.StatusID
-                WHERE role.RoleID == 2 OR role.RoleID IS NULL
+                WHERE role.RoleID IN (NULL, 2) AND team.`D-Flag` IS NULL
                 GROUP BY team.TeamID
                 ORDER BY team.TeamID ASC
                 LIMIT ?, 15;""", ((page-1) * 15,)) as cursor:
@@ -141,7 +141,7 @@ class Team:
                     teamname += f"`#{result[0]:>2}` {result[2]} \u200b \u200b \u200b\n"
         # generate embed
         embed = discord.Embed(title="__Team List__",
-                              description=f"List of all registered teams in Northgard Battle\n \nPage: {page}",
+                              description=f"List of all registered teams in NorthgardBattle\n \nPage: {page}",
                               colour=6809006,
                               timestamp = datetime.now())
         embed.set_footer(text="--- List: sorted by TeamID --- ||")
@@ -150,7 +150,7 @@ class Team:
         else:
             embed.add_field(name="Team", value=teamname, inline=True)
             embed.add_field(name="Leader", value=leaders, inline=True)
-        await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+        await ctx.author.send(embed=embed)
 
 
     # register_team(): async
@@ -172,7 +172,7 @@ class Team:
                 if player[2] == None:
                     # check: is verified player?
                     if player[1] == 2:
-                        cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ?;", (name,))
+                        cursor = await db.execute("SELECT TeamID FROM team WHERE Name = ? AND `D-Flag` IS NULL;", (name,))
                         team = await cursor.fetchone()
                         await cursor.close()
                         if team is None:
@@ -222,7 +222,7 @@ class Team:
             cursor = await db.execute("""
                 SELECT TeamID, StatusID
                 FROM team
-                WHERE team.Name = ?""", (name,))
+                WHERE team.Name = ? AND `D-Flag` IS NULL""", (name,))
             team = await cursor.fetchone()
             await cursor.close()
             if team is not None:
@@ -518,8 +518,7 @@ class Team:
                 except asyncio.TimeoutError:
                     await ctx.send("Your Team-Disband request (10sec) timed out. Retry...")
                 else:
-                    await db.execute("DELETE FROM teamplayer WHERE teamID = ? ;", (team[0],))
-                    await db.execute("DELETE FROM team WHERE teamID = ? ;", (team[0],))
+                    await db.execute("UPDATE team SET `D-Flag` = 1 WHERE TeamID = ?;", (team[0],))
                     await db.commit()
                     return await ctx.send("You successfully disbanded your Team")
             else:
@@ -536,7 +535,7 @@ class Team:
             team = await cursor.fetchone()
             await cursor.close()
             if team is not None:
-                await db.execute("DELETE FROM team WHERE TeamID = ?;", (team[0],))
+                await db.execute("UPDATE team SET `D-Flag` = 1 WHERE TeamID = ?;", (team[0],))
                 await db.commit()
                 return await ctx.send(f"Team {name} got successfully deleted.")
             else:
