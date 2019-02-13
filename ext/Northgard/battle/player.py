@@ -70,7 +70,7 @@ class Player:
                 LEFT JOIN discord ON discord.ReferenceID = player.PlayerID
                 LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID
                 LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID
-                WHERE player.Name = ? AND discord.Reference = 'Player';""", (name,))
+                WHERE player.Name = ? AND discord.Reference = 'Player' AND player.`D-Flag` IS NULL;""", (name,))
             result = await cursor.fetchone()
             await cursor.close()
             # load achievements
@@ -130,6 +130,7 @@ class Player:
                 SELECT p.PlayerID, p.Name, p.Points, s.Value, p.Registration
                 FROM player p
                 LEFT JOIN status s on s.StatusID = p.StatusID
+                WHERE p.`D-Flag` IS NULL
                 ORDER BY p.PlayerID LIMIT ?, 15;""", ((page-1) * 15, )) as cursor:
                 players = ""
                 points = ""
@@ -141,9 +142,9 @@ class Player:
                     stati += f"{result[3]}\n"
         # generate embed
         embed = discord.Embed(title="__Player List__",
-                              description=f"List of all registered players in Northgard Battle\n \nPage: {page}",
+                              description=f"List of all registered players in NorthgardBattle\n \nPage: {page}",
                               colour=6809006,
-                              timestamp = datetime.now())
+                              timestamp=datetime.now())
         embed.set_footer(text="--- List: sorted by PlayerID --- ||")
         if not players:
             embed.add_field(name="Player", value="no players listed here.", inline=True)
@@ -151,7 +152,7 @@ class Player:
             embed.add_field(name="Player", value=players, inline=True)
             embed.add_field(name="Points", value=points, inline=True)
             embed.add_field(name="Status", value=stati, inline=True)
-        await ctx.author.send(content=f"used Feature: NorthgardBattle `{ctx.message.content}`", embed=embed)
+        await ctx.author.send(embed=embed)
 
 
     # add_player(): async
@@ -219,9 +220,7 @@ class Player:
                 except asyncio.TimeoutError:
                     await ctx.author.send("Your Player-Delete request (10sec) timed out. Retry...")
                 else:
-                    await db.execute("DELETE FROM playerachievements WHERE PlayerID = ? ;", (player[0],))
-                    await db.execute("DELETE FROM teamplayer WHERE PlayerID = ? ;", (player[0],))
-                    await db.execute("DELETE FROM player WHERE PlayerID = ? ;", (player[0],))
+                    await db.execute("UPDATE player SET `D-Flag` = 1 WHERE PlayerID = ?;", (player[0],))
                     await db.commit()
                     return await ctx.author.send("You successfully deleted your Player profile.")
             else:
@@ -244,19 +243,6 @@ class Player:
                     await db.execute('UPDATE player SET Description = ? WHERE Name = ?;', (data,ctx.author.name))
                 await db.commit()
             await ctx.author.send(f"Your Player-Data '{subject}' got set to `{data}`")
-
-
-    # [DEV] dummy(): async
-    @player.command(name="dummy", hidden = True)
-    async def dummy_player(self, ctx):
-        """[DEV] Player Dummy"""
-        embed = discord.Embed(title='__Equindar__',description='bla bla bla, custom description, bla bla blubb, bla bla bla, custom description, bla bla blubb, bla bla bla, custom description, bla bla blubb, bla bla bla, custom description, bla bla blubb!',colour=6809006)
-        embed.set_thumbnail(url = "https://d1u5p3l4wpay3k.cloudfront.net/northgard_gamepedia_en/0/05/Through_Helheim_and_back.jpg")
-        embed.set_footer(text='--- Player-ID: #2 --- || --- Registered: 2018-12-01 --- || --- Status: verified ---')
-        embed.add_field(name='Team(s)', value='Blood Eagle Selfie', inline = True)
-        embed.add_field(name='Performance', value='**--- 28 pts ---**\n75% Winrate\n*4 Matches played*', inline = True)
-        embed.add_field(name='Match History (latest 5)', value='`W 📈 +10 pts` -vs- `Team: Frostbite`\n`L 📉 -14 pts` -vs- `Team: Set in Stone`\n`W 📈 + 8 pts` -vs- `Team: Pinar`\n`W 📈 +24 pts` -vs- `Team: chip n dale`', inline = True)
-        await ctx.send(content='used Feature: NorthgardBattle `' + ctx.message.content + '`', embed=embed)
 
 
 # --- routine: setup/assign cog
