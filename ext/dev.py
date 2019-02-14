@@ -313,11 +313,23 @@ class DEV:
 
 
     @commands.command(hidden=True)
+    @commands.is_owner()
     async def bla(self, ctx):
         """bla test funtion"""
-        str = "Leader"
-        await ctx.send(f"`{str:<9}:`")
+        desc = f"`✔️` Team **Blood Eagle Selfie** joined the Tournament."
+        embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
+        embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
+        return await server.get_channel(545596671783075850).send(embed=embed)
 
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def bot_command(self, ctx):
+        desc = "```This \"EquinsBot Area\" is my precious playground.\nFeel free to visit and talk to me here. I reply as good as i can.\n\nIf you are new and dont know how to deal with me, check out the guides...\nTake care and enjoy your day now... *beep beep boop*```"
+        embed = discord.Embed(title="__Welcome to **MY Realm**__",description=desc,colour=3158584)
+        embed.set_footer(text="--- EquinsBot --- || --- Information --- ")
+        embed.add_field(name="To see the guides, issue: `!guide`", value="~EquinsBot", inline=False)
+        return await ctx.send(embed=embed)
 
 #@bot.command()
 #async def liv(ctx):

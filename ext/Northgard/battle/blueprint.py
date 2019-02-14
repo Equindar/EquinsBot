@@ -40,7 +40,7 @@ class Blueprint:
         embed = discord.Embed(title="__Confirmation Phase__",description=desc,
             colour=discord.Colour.dark_red(), timestamp = datetime.now())
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url_as(format='png', size=512))
-        embed.set_footer(text=f"--- Tournament: Bloody January 2019 --- ||")
+        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
         embed.add_field(name="Perform the following command to confirm:", value="```Diff\n!tournament confirm\n``` \u200b \u200b\u200b \u200b\u200b \u200b\u200b \u200b `⚠️` Only the Team Leader can confirm the Team participation.\n\u200b \u200b", inline=False)
         embed.add_field(name="Confirmation ends:", value="**2019-01-25 **(Fri.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Bracket Announcement:", value="**2019-01-25 **(Fri.)\n**2:00 pm CET**", inline=True)
@@ -95,7 +95,7 @@ class Blueprint:
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
-        embed.set_image(url="https://i.imgur.com/AMxwdFU.png")
+        embed.set_image(url="https://media.discordapp.net/attachments/519076924157329418/545574122898456607/northgard_tournament_cover.png")
         embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
         embed.add_field(name="Start", value="**2019-02-23 **(Sat.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Prize (team based)", value="**1st Place: 80€\n2nd Place: 40€**", inline=True)
@@ -122,7 +122,7 @@ class Blueprint:
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
-        embed.set_image(url="https://i.imgur.com/AMxwdFU.png")
+        embed.set_image(url="https://media.discordapp.net/attachments/519076924157329418/545574122898456607/northgard_tournament_cover.png")
         embed.add_field(name="Start", value="**2019-02-23 **(Sat.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Prize (team based)", value="**1st Place: 80€\n2nd Place: 40€**", inline=True)
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
@@ -147,9 +147,9 @@ class Blueprint:
         embed.add_field(name="__Start:__", value="```2019-02-23 (Sat.)\n12:00 pm CET```", inline=True)
         embed.add_field(name="__Prize: (team based)__", value="```1st Place: 80€\n2nd Place: 40€```", inline=True)
         embed.add_field(name="\u200b \u200b", value="\u200b \u200b", inline=True)
-        embed.add_field(name="Registration:", value=server.get_channel(537581556202733568).mention, inline=True)
-        embed.add_field(name="Bracket:", value=server.get_channel(537580627105415168).mention, inline=True)
-        embed.add_field(name="Match-Results:", value=server.get_channel(537580628736999434).mention, inline=True)
+        embed.add_field(name="Registration:", value=server.get_channel(545596671783075850).mention, inline=True)
+        embed.add_field(name="Bracket:", value=server.get_channel(545588860344598532).mention, inline=True)
+        embed.add_field(name="Match-Results:", value=server.get_channel(545588862274240533).mention, inline=True)
         return await ctx.send(embed=embed)
 
 
@@ -191,7 +191,7 @@ class Blueprint:
     async def banner(self, ctx):
         """Banner Blueprint"""
         embed = discord.Embed(colour=discord.Colour.dark_red())
-        embed.set_image(url="https://i.imgur.com/AMxwdFU.png")
+        embed.set_image(url="https://media.discordapp.net/attachments/519076924157329418/545574122898456607/northgard_tournament_cover.png")
         return await ctx.send(embed=embed)
 
 
@@ -210,7 +210,7 @@ class Blueprint:
                 ```!guide player```Or take the Crash Course (the "TLDR" Guide):
                 ```!crash-course```""")
         embed.add_field(name="Problems with `bot commands`?", value=f"*If you have issues, feel free to contact {self.bot.get_guild(self.bot.northgardbattle).get_member(362347317724184580).mention} for help.*")
-        embed.add_field(name="Questions?", value=f"*Post your question on {self.bot.get_guild(self.bot.northgardbattle).get_channel(537580627537559554).mention} or contact {self.bot.get_guild(self.bot.northgardbattle).get_role(509005550948974603).mention} / {self.bot.get_guild(self.bot.northgardbattle).get_role(519434488225333269).mention}.*")
+        embed.add_field(name="Questions?", value=f"*Post your question on {self.bot.get_guild(self.bot.northgardbattle).get_channel(545588861833838592).mention} or contact {self.bot.get_guild(self.bot.northgardbattle).get_role(509005550948974603).mention} / {self.bot.get_guild(self.bot.northgardbattle).get_role(519434488225333269).mention}.*")
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
         return await ctx.send(embed=embed)

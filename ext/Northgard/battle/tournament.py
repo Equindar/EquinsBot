@@ -192,13 +192,14 @@ class Tournament:
                     except asyncio.TimeoutError:
                         await ctx.author.send("Your Tournament-Join request (20sec) timed out. Retry...")
                     else:
+                        limit = 16
+                        counter = 0
                         async with db.execute("""
                             SELECT team.TeamID, participant.Position, tournament.TeamLimit
                             FROM participant
                             LEFT JOIN team ON team.TeamID = participant.TeamID
                             LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
                             WHERE participant.TournamentID = ?""", (dict[reply.content],)) as cursor:
-                            counter = 0
                             async for result in cursor:
                                 if result[0] == team[0]:
                                     return await ctx.author.send(f"Your Team '{team[1]}' already joined '{reply.content}'")
@@ -277,7 +278,7 @@ class Tournament:
             desc = f"`✔️` Team **{result[3]}** joined the Tournament\nIt got set to the BackupQueue (Position: #{pos-16})."
         embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
         embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
-        return await server.get_channel(537581556202733568).send(embed=embed)
+        return await server.get_channel(545596671783075850).send(embed=embed)
 
 
     # confirm_tournament(): async
@@ -335,7 +336,7 @@ class Tournament:
                                     desc = f"`✔️` Team **{player[2]}** confirmed its Tournament participation."
                                     embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
                                     embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
-                                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
+                                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(545596671783075850).send(embed=embed)
 
                                 else:
                                     output = ""
@@ -387,7 +388,7 @@ class Tournament:
                     desc = f"`❌` Team **{participant[1]}** left the Tournament."
                     embed = discord.Embed(description=desc,colour=discord.Colour.red(), timestamp = datetime.now())
                     embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
-                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(537581556202733568).send(embed=embed)
+                    return await self.bot.get_guild(self.bot.northgardbattle).get_channel(545596671783075850).send(embed=embed)
             else:
                 await ctx.author.send("""You **cannot leave** the tournament.
                     \n__Reasons can be:__\nYou are not in a Tournament.\nYou are not the Team Leader.""")
@@ -521,7 +522,7 @@ class Tournament:
 
         # create category
         category = await ctx.guild.create_category_channel(f"[{name}]", overwrites=ow_category)
-        await category.edit(position=2)
+        await category.edit(position=3)
         # create channels
         ch_info     = await ctx.guild.create_text_channel("Information", category=category)
         ch_bracket  = await ctx.guild.create_text_channel("Bracket", category=category, overwrites=ow_bracket)
