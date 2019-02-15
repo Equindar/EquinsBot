@@ -16,6 +16,13 @@ class Errors:
     # --- @bot.event handling
     # on_command_error
     async def on_command_error(self, ctx, error):
+
+        # TODO: improve error handling based on servers/roles/clients
+        # Ignore errors from NGO
+        if ctx.guild.id == 225335295128633345:
+            return
+
+
         # Logging error
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if not isinstance(ctx.message.channel, discord.DMChannel):
