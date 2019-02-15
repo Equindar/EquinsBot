@@ -283,7 +283,6 @@ class Tournament:
 
     # confirm_tournament(): async
     @tournament.command(name="confirm", hidden=True)
-    @commands.is_owner()
     async def confirm_tournament(self, ctx):
         alerts = {
             1: "We are so silent? - Yeah, no warcry for unworthy opponents...",
