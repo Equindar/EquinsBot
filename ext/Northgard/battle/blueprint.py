@@ -95,7 +95,7 @@ class Blueprint:
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
-        embed.set_image(url="https://media.discordapp.net/attachments/519076924157329418/545574122898456607/northgard_tournament_cover.png")
+        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/5/5b/Northgard_tournament_cover.png")
         embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
         embed.add_field(name="Start", value="**2019-02-23 **(Sat.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Prize (team based)", value="**1st Place: 80€\n2nd Place: 40€**", inline=True)
@@ -122,7 +122,7 @@ class Blueprint:
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
-        embed.set_image(url="https://media.discordapp.net/attachments/519076924157329418/545574122898456607/northgard_tournament_cover.png")
+        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/5/5b/Northgard_tournament_cover.png")
         embed.add_field(name="Start", value="**2019-02-23 **(Sat.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Prize (team based)", value="**1st Place: 80€\n2nd Place: 40€**", inline=True)
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
@@ -191,7 +191,7 @@ class Blueprint:
     async def banner(self, ctx):
         """Banner Blueprint"""
         embed = discord.Embed(colour=discord.Colour.dark_red())
-        embed.set_image(url="https://media.discordapp.net/attachments/519076924157329418/545574122898456607/northgard_tournament_cover.png")
+        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/5/5b/Northgard_tournament_cover.png")
         return await ctx.send(embed=embed)
 
 
