@@ -213,7 +213,7 @@ class Tournament:
                                 INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
                                 VALUES (1, ?, ?, ?)""", (dict[reply.content], team[0], position + 1))
                             await db.commit()
-                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0])
+                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0], dict[reply.content])
                             return await ctx.author.send(f"Your Team '{team[1]}' **successfully joined** '{reply.content}'")
                         else:
                             # push to BackupQueue
@@ -232,7 +232,7 @@ class Tournament:
                 return await ctx.author.send("No active (joinable) Tournament found.")
 
 
-    async def team_joined(self, ctx, pos: int, team_id: int):
+    async def team_joined(self, ctx, pos: int, team_id: int, tournament_id: int):
         """DISCORD WORKFLOW"""
         server = self.bot.get_guild(self.bot.northgardbattle)
         team = None
@@ -244,7 +244,8 @@ class Tournament:
                 LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
                 LEFT JOIN team ON team.TeamID = teamplayer.TeamID
 				LEFT JOIN participant ON participant.TeamID = team.TeamID
-                WHERE discord.Reference = "Player" AND teamplayer.TeamID = ?""", (team_id,)) as cursor:
+                WHERE discord.Reference = "Player" AND teamplayer.TeamID = ?
+                AND participant.TournamentID = ?""", (team_id, tournament_id)) as cursor:
                 async for result in cursor:
                     if team is None:
                         for item in server.roles:
