@@ -175,7 +175,7 @@ class DEV:
                 SELECT participant.ParticipantTypeID, participant.Position, team.Name
                 FROM participant
                 LEFT JOIN team ON team.TeamID = participant.TeamID
-                WHERE participant.TournamentID = 2
+                WHERE participant.TournamentID = 3
                 ORDER BY participant.ParticipantID;""") as cursor:
                 async for result in cursor:
                     team = None

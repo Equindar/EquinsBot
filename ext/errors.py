@@ -19,8 +19,9 @@ class Errors:
 
         # TODO: improve error handling based on servers/roles/clients
         # Ignore errors from NGO
-        if ctx.guild.id == 225335295128633345:
-            return
+        if not isinstance(ctx.message.channel, discord.DMChannel):
+            if ctx.guild.id == 225335295128633345:
+                return
 
 
         # Logging error

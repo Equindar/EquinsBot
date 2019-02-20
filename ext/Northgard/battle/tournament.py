@@ -439,7 +439,7 @@ class Tournament:
             5:":five:", 6:":six:", 7:":seven:", 8:":eight:", 9:":nine:"
         }
         now = datetime.now()
-        date = datetime(2019,1,26,12,0,0)
+        date = datetime(2019,2,23,12,0,0)
         # create dict
         td = date - now
         if td.total_seconds() < 0:
@@ -461,7 +461,7 @@ class Tournament:
         embed = discord.Embed(colour=3158584, timestamp = date - timedelta(hours=1))
         embed.add_field(name='Tournament: **Bloody February 2019** starting in...',
                         value=f":stopwatch: {x}\n \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b`\u200b DAYS \u200b` \u200b \u200b `\u200b HOURS ` \u200b \u200b \u200b `\u200b MINS \u200b` \u200b \u200b `\u200b SECS \u200b`")
-        await ctx.send(content="Last Minute Tournament Check in? @everyone", embed=embed)
+        await ctx.send(content="Registration is ongoing, join if you dare! @everyone", embed=embed)
 
 
     # deadline(): async

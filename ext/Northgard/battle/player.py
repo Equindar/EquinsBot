@@ -151,7 +151,7 @@ class Player:
         else:
             embed.add_field(name="Player", value=players, inline=True)
             embed.add_field(name="Points", value=points, inline=True)
-            embed.add_field(name="Status", value=stati, inline=True)
+#            embed.add_field(name="Status", value=stati, inline=True)
         await ctx.author.send(embed=embed)
 
 
