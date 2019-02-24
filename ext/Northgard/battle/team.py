@@ -59,7 +59,7 @@ class Team:
                 LEFT JOIN player ON teamplayer.PlayerID = player.PlayerID
                 LEFT JOIN status ON status.StatusID = team.StatusID
                 WHERE team.name = ? AND team.`D-Flag` IS NULL
-                ORDER BY role.RoleID ASC;""", (name,))
+                ORDER BY role.RoleID ASC;""", (name.strip(),))
             team = await cursor.fetchall()
             await cursor.close()
 

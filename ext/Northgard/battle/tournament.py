@@ -71,7 +71,7 @@ class Tournament:
                 async for result in cursor:
                     # data manipulation: db result (tuple)
                     if counter < 16:
-                        if result[5] == 'confirmed':
+                        if result[5] == 'confirmed' or result[5] == 'qualified':
                             part_stati += "`✔️` "
                         elif result[5] == 'failed':
                             part_stati += "`❌` "
@@ -125,7 +125,7 @@ class Tournament:
                 LEFT JOIN player ON player.PlayerID = teamplayer.PlayerID
                 LEFT JOIN status ON participant.StatusID = status.StatusID
                 LEFT JOIN tournament ON tournament.TournamentID = participant.TournamentID
-                WHERE tournament.TournamentID = 3 AND participant.StatusID = 8
+                WHERE tournament.TournamentID = 3 AND participant.StatusID IN (8,10)
                 ORDER BY participant.Position ASC;""") as cursor:
 
                 team = { }
@@ -213,7 +213,7 @@ class Tournament:
                                 INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
                                 VALUES (1, ?, ?, ?)""", (dict[reply.content], team[0], position + 1))
                             await db.commit()
-                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0], dict[reply.content])
+                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0], tournament_id = dict[reply.content])
                             return await ctx.author.send(f"Your Team '{team[1]}' **successfully joined** '{reply.content}'")
                         else:
                             # push to BackupQueue
@@ -221,7 +221,7 @@ class Tournament:
                                 INSERT INTO participant (ParticipantTypeID, TournamentID, TeamID, Position)
                                 VALUES (2, ?, ?, ?)""", (dict[reply.content], team[0], position + 1))
                             await db.commit()
-                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0])
+                            await self.team_joined(ctx, pos = counter + 1, team_id = team[0], tournament_id = dict[reply.content])
                             return await ctx.author.send(
                                 f"""Your Team '{team[1]}' **successfully joined** '{tournament[1]}'
                                 \nYou entered the BackupQueue at Position #{(counter + 1) - limit}""")

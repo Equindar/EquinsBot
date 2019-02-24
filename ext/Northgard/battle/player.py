@@ -70,7 +70,7 @@ class Player:
                 LEFT JOIN discord ON discord.ReferenceID = player.PlayerID
                 LEFT JOIN playerachievements ON playerachievements.PlayerID = player.PlayerID
                 LEFT JOIN achievements ON achievements.AchievementID = playerachievements.AchievementID
-                WHERE player.Name = ? AND discord.Reference = 'Player' AND player.`D-Flag` IS NULL;""", (name,))
+                WHERE player.Name = ? AND discord.Reference = 'Player' AND player.`D-Flag` IS NULL;""", (name.strip(),))
             result = await cursor.fetchone()
             await cursor.close()
             # load achievements
