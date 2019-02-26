@@ -161,15 +161,15 @@ class Blueprint:
         desc = """
             **Registration:**
             Once 16 Teams are registered, the `BackUp-Queue` is enabled.
-            *Further team registration are put into the queue and getting chronologically replaced, when a team disband or dont show up intime at the tournament.*
+            *Further team registrations are put into the queue and getting chronologically replaced, when a team disbands or doesn't show up intime at the tournament.*
             Let the hope die last!
 
             **Bracket:**
-            When all 16 teams are confirmed, the Bracket gets shuffled and published.
-            The Bracket will show what team that is going to create the lobby. It is very important that you check the bracket to see who your opponent is. When the lobby is created, the other team has 10 min to join and start the game. If not, they will auto loose.
+            When all 16 teams are confirmed, the bracket gets shuffled and published.
+            The bracket will show, which team creates the lobby. It is very important, that you check the bracket to see who your opponent is. When the lobby is created, the other team has 10mins to join and start the game. If not, they will auto-lose.
 
             **Bans:**
-            Each team will have the option to BAN a clan. The 2 clans that are banned can not be played by either team! Performing the Banning Phase in the Game Lobby!
+            Each team will has the option to BAN a clan. The two banned clans cannot be played by either team! Performing the 'Banning Phase' in the Northgard game lobby!
 
             **Disconnects:**
             If someone during game gets disconnected, you cannot start over. This is yet again because we have to provide a good flow so we don’t have to wait to long for next match to start.
