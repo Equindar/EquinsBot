@@ -186,7 +186,10 @@ class Team:
                                 FROM team
                                 WHERE Name = ?;""", (player[0], name))
                             await db.commit()
-                            return await ctx.send(f"{ctx.author.mention} successfully registered the Team '{name}'")
+                            desc = f"`✔️` {ctx.author.mention} successfully registered the Team **'{name}'**"
+                            embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
+                            embed.set_footer(text="--- NorthgardBattle: Team Registration --- ||")
+                            return await self.bot.get_guild(self.bot.northgardbattle).get_channel(550985519639822336).send(embed=embed)
                         else:
                             return await ctx.author.send(f"Team '{name}' is already registered, use a unique team name.")
                     else:

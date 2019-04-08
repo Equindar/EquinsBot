@@ -210,8 +210,11 @@ class DEV:
             if item.id == 519174714002898984:
                 category = item
         for channel in category.channels:
-            await channel.delete()
-            await ctx.send(f"Channel {channel.name} deleted.")
+            try:
+                await channel.delete()
+                await ctx.send(f"Channel {channel.name} deleted.")
+            except:
+                pass
 
 
 
@@ -316,10 +319,10 @@ class DEV:
     @commands.is_owner()
     async def bla(self, ctx):
         """bla test funtion"""
-        desc = f"`✔️` Team **Rushing team [RT]** joined the Tournament."
+        desc = f"`✔️` Team **Blood Eagle Selfie** joined the Tournament."
         embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
-        embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
-        return await self.bot.get_guild(self.bot.northgardbattle).get_channel(545596671783075850).send(embed=embed)
+        embed.set_footer(text="--- Tournament: Bloody Relics --- ||")
+        return await self.bot.get_guild(self.bot.northgardbattle).get_channel(550985519639822336).send(embed=embed)
 
 
     @commands.command(hidden=True)

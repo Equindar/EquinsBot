@@ -40,9 +40,9 @@ class Blueprint:
         embed = discord.Embed(title="__Confirmation Phase__",description=desc,
             colour=discord.Colour.dark_red(), timestamp = datetime.now())
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url_as(format='png', size=512))
-        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
+        embed.set_footer(text=f"--- Tournament: Bloody Relics --- ||")
         embed.add_field(name="Perform the following command to confirm:", value="```Diff\n!tournament confirm\n``` \u200b \u200b\u200b \u200b\u200b \u200b\u200b \u200b `⚠️` Only the Team Leader can confirm the Team participation.\n\u200b \u200b", inline=False)
-        embed.add_field(name="Confirmation ends:", value="**2019-01-25 **(Fri.)\n**12:00 pm CET**", inline=True)
+        embed.add_field(name="Confirmation ends:", value="**2019-04-26 **(Fri.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Bracket Announcement:", value="**2019-01-25 **(Fri.)\n**2:00 pm CET**", inline=True)
         return await ctx.send(embed=embed)
 
@@ -73,7 +73,7 @@ class Blueprint:
                               colour=discord.Colour.dark_teal(),
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
-        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
+        embed.set_footer(text=f"--- Tournament: Bloody Relics --- ||")
         embed.add_field(name="Lobby Settings", value=setting, inline=True)
         embed.add_field(name="\u200b \u200b", value=value, inline=True)
         return await ctx.send(embed=embed)
@@ -84,10 +84,10 @@ class Blueprint:
     async def announcement(self, ctx):
         """Announcement Blueprint"""
 
-        embed = discord.Embed(title="__Announcement: **Bloody February 2019**__",description="""
+        embed = discord.Embed(title="__Announcement: **Bloody Relics**__",description="""
             Ahoi Warchief's
             *Sharpen your axes and let the ground get soaked in blood for glory, for Valhalla, for ODIN!
-            Compete with your team in our `Bloody February 2019` tournament and face 15 other teams.
+            Compete with your team in our `Bloody Relics` tournament and face 15 other teams.
             Train, fight, win...*
             ~ NorthgardBattle Staff
             \n```\"Grab your strongest brother in arms and sign up to fight until you're the last one standing\"\n\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b~Weihn8smann```
@@ -95,9 +95,9 @@ class Blueprint:
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
-        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/5/5b/Northgard_tournament_cover.png")
-        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
-        embed.add_field(name="Start", value="**2019-02-23 **(Sat.)\n**12:00 pm CET**", inline=True)
+        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/8/86/Northgard_Tournament_cover_Bloody_Relics.png")
+        embed.set_footer(text=f"--- Tournament: Bloody Relics --- ||")
+        embed.add_field(name="Start", value="**2019-04-27 **(Sat.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Prize (team based)", value="**1st Place: 80€\n2nd Place: 40€**", inline=True)
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
         embed.add_field(name="Match-Ups", value="2 vs 2", inline=True)
@@ -111,19 +111,19 @@ class Blueprint:
     async def news(self, ctx):
         """News Blueprint"""
 
-        embed = discord.Embed(title="__Announcement: **Bloody February 2019**__",description="""
+        embed = discord.Embed(title="__Announcement: **Bloody Relics**__",description="""
             Ahoi Warchief's,
             *Sharpen your axes and let the ground get soaked in blood for glory, for Valhalla, for ODIN!
-            Compete with your team in our `Bloody February 2019` tournament and face 15 other teams.
+            Compete with your team in our `Bloody Relics` tournament and face 15 other teams.
             Train, fight, win...*
             ~ NorthgardBattle Staff
             \n```\"Grab your strongest brother in arms and sign up to fight until you're the last one standing\"\n\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b~Weihn8smann```""",
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
-        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
-        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/5/5b/Northgard_tournament_cover.png")
-        embed.add_field(name="Start", value="**2019-02-23 **(Sat.)\n**12:00 pm CET**", inline=True)
+        embed.set_footer(text=f"--- Tournament: Bloody Relics --- ||")
+        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/8/86/Northgard_Tournament_cover_Bloody_Relics.png")
+        embed.add_field(name="Start", value="**2019-04-27 **(Sat.)\n**12:00 pm CET**", inline=True)
         embed.add_field(name="Prize (team based)", value="**1st Place: 80€\n2nd Place: 40€**", inline=True)
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
         embed.add_field(name="Match-Ups", value="2 vs 2", inline=True)
@@ -135,21 +135,21 @@ class Blueprint:
     async def information(self, ctx):
         """Information Blueprint"""
         server = self.bot.get_guild(self.bot.northgardbattle)
-        embed = discord.Embed(title="__Information: **Bloody February 2019**__",description="""
+        embed = discord.Embed(title="__Information: **Bloody Relics**__",description="""
             Hello Warlords of Northgard!
-            ... and welcome to the "Bloody February 2019"-Tournament.
+            ... and welcome to the "Bloody Relics"-Tournament.
 
             It's a **2 v 2** Tournament with **16** Teams compete against each other.""",
                               colour=discord.Colour.dark_red(),
                               timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
-        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
-        embed.add_field(name="__Start:__", value="```2019-02-23 (Sat.)\n12:00 pm CET```", inline=True)
+        embed.set_footer(text=f"--- Tournament: Bloody Relics --- ||")
+        embed.add_field(name="__Start:__", value="```2019-04-27 (Sat.)\n12:00 pm CET```", inline=True)
         embed.add_field(name="__Prize: (team based)__", value="```1st Place: 80€\n2nd Place: 40€```", inline=True)
         embed.add_field(name="\u200b \u200b", value="\u200b \u200b", inline=True)
-        embed.add_field(name="Registration:", value=server.get_channel(545596671783075850).mention, inline=True)
-        embed.add_field(name="Bracket:", value=server.get_channel(545588860344598532).mention, inline=True)
-        embed.add_field(name="Match-Results:", value=server.get_channel(545588862274240533).mention, inline=True)
+        embed.add_field(name="Registration:", value=server.get_channel(564906750013079562).mention, inline=True)
+        embed.add_field(name="Bracket:", value=server.get_channel(564906487252779018).mention, inline=True)
+        embed.add_field(name="Match-Results:", value=server.get_channel(564906490607960064).mention, inline=True)
         return await ctx.send(embed=embed)
 
 
@@ -180,9 +180,9 @@ class Blueprint:
             **Broadcasts / Streaming:**
             Most of the games will be broadcasted by our NorthgardBattle Streamers. They will add you on Steam so they are able to stream it. Check your friend requests and add them."""
         server = self.bot.get_guild(self.bot.northgardbattle)
-        embed = discord.Embed(title="__Details: **Bloody February 2019**__",description=desc,colour=discord.Colour.dark_red(),timestamp = datetime.now())
+        embed = discord.Embed(title="__Details: **Bloody Relics**__",description=desc,colour=discord.Colour.dark_red(),timestamp = datetime.now())
         embed.set_author(name="NorthgardBattle Staff")
-        embed.set_footer(text=f"--- Tournament: Bloody February 2019 --- ||")
+        embed.set_footer(text=f"--- Tournament: Bloody Relics --- ||")
         return await ctx.send(embed=embed)
 
 
@@ -191,7 +191,7 @@ class Blueprint:
     async def banner(self, ctx):
         """Banner Blueprint"""
         embed = discord.Embed(colour=discord.Colour.dark_red())
-        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/5/5b/Northgard_tournament_cover.png")
+        embed.set_image(url="https://gamepedia.cursecdn.com/northgard_gamepedia_en/8/86/Northgard_Tournament_cover_Bloody_Relics.png")
         return await ctx.send(embed=embed)
 
 
@@ -210,7 +210,7 @@ class Blueprint:
                 ```!guide player```Or take the Crash Course (the "TLDR" Guide):
                 ```!crash-course```""")
         embed.add_field(name="Problems with `bot commands`?", value=f"*If you have issues, feel free to contact {self.bot.get_guild(self.bot.northgardbattle).get_member(362347317724184580).mention} for help.*")
-        embed.add_field(name="Questions?", value=f"*Post your question on {self.bot.get_guild(self.bot.northgardbattle).get_channel(545588861833838592).mention} or contact {self.bot.get_guild(self.bot.northgardbattle).get_role(509005550948974603).mention} / {self.bot.get_guild(self.bot.northgardbattle).get_role(519434488225333269).mention}.*")
+        embed.add_field(name="Questions?", value=f"*Post your question on {self.bot.get_guild(self.bot.northgardbattle).get_channel(564906489240616985).mention} or contact {self.bot.get_guild(self.bot.northgardbattle).get_role(509005550948974603).mention} / {self.bot.get_guild(self.bot.northgardbattle).get_role(519434488225333269).mention}.*")
         embed.set_author(name="NorthgardBattle Staff")
         embed.set_footer(text="--- Tournament: Bloody February 2019 --- ||")
         return await ctx.send(embed=embed)
