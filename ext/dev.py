@@ -319,7 +319,7 @@ class DEV:
     @commands.is_owner()
     async def bla(self, ctx):
         """bla test funtion"""
-        desc = f"`✔️` Team **Blood Eagle Selfie** joined the Tournament."
+        desc = f"`✔️` Team **High King** joined the Tournament."
         embed = discord.Embed(description=desc,colour=discord.Colour.dark_green(), timestamp = datetime.now())
         embed.set_footer(text="--- Tournament: Bloody Relics --- ||")
         return await self.bot.get_guild(self.bot.northgardbattle).get_channel(550985519639822336).send(embed=embed)

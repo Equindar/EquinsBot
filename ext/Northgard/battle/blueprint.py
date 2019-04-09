@@ -84,6 +84,8 @@ class Blueprint:
     async def announcement(self, ctx):
         """Announcement Blueprint"""
 
+        NBO_tournament_channel = self.bot.get_guild(225335295128633345).get_channel(347294810211614721)
+
         embed = discord.Embed(title="__Announcement: **Bloody Relics**__",description="""
             Ahoi Warchief's
             *Sharpen your axes and let the ground get soaked in blood for glory, for Valhalla, for ODIN!
@@ -102,8 +104,8 @@ class Blueprint:
         embed.add_field(name="Team Limit:", value="16 Teams", inline=True)
         embed.add_field(name="Match-Ups", value="2 vs 2", inline=True)
         embed.add_field(name="Map-Details", value="`Mode:` Ragnarok\u200b \u200b \u200b `Difficulty:` High\u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b \u200b `Win Conditions:` All\n`Size:` Medium\u200b \u200b \u200b \u200b \u200b \u200b`Generation:` Balanced", inline=False)
-        await ctx.send(content="*NorthgardBattle is hosting a new tournament*, @everyone", embed=embed)
-        return await ctx.send("**For more information check out the NorthgardBattle Discord server:**\nhttps://discord.gg/tbcZcjG")
+        await NBO_tournament_channel.send(content="*NorthgardBattle is hosting a new tournament*, @everyone", embed=embed)
+        return await NBO_tournament_channel.send("**For more information check out the NorthgardBattle Discord server:**\nhttps://discord.gg/tbcZcjG")
 
 
     # news(): async

@@ -93,7 +93,7 @@ class Guide:
         embed = discord.Embed(title="__Guide **In-Dept: Leader**__",description=desc,colour=3158584)
         embed.set_footer(text="--- EquinsBot --- || --- Guide #3 (\"In-Dept: Leader\") --- ")
         embed.add_field(name="How do i edit my Team data?", value="```\n!team set name [new name]\n!team set description [text]```", inline=False)
-        embed.add_field(name="How can invite registered Player?", value="```\n!team invite Member\n!team invite Substitute```", inline=False)
+        embed.add_field(name="How can i invite registered Player?", value="```\n!team invite Member\n!team invite Substitute```", inline=False)
         embed.add_field(name="How can i change the Team roster?", value="```!team assign Member [Player Name]\n!team assign Substitute [Player Name]```", inline=False)
         embed.add_field(name="How can i disband my Team?", value="```!team disband```", inline=False)
         embed.add_field(name="\u200b \u200b", value="**Congratulation, you know now how to manage your Team!**\n*Next Step: Tournaments:* `!guide tournament`")

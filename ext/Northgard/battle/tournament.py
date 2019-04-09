@@ -159,6 +159,7 @@ class Tournament:
     @tournament.command(name="join")
     async def join_tournament(self, ctx):
         """join an active Tournament"""
+        server = self.bot.get_guild(self.bot.northgardbattle)
         async with aiosqlite.connect('./ext/Northgard/battle/data/battle-db.sqlite') as db:
             # check: list active tournament
             cursor = await db.execute("""
@@ -382,7 +383,7 @@ class Tournament:
                     await ctx.author.send("Your Tournament-Leave request (10sec) timed out. Retry...")
                 else:
                     await self.team_left(ctx, team_id = participant[3])
-                    await db.execute("DELETE FROM participant WHERE participant.ParticipantID = ?", (participant[0],))
+                    await db.execute("DELETE FROM participant WHERE participant.ParticipantID = ? AND participant.TournamentID = 4", (participant[0],))
                     await db.commit()
                     await ctx.author.send(f"Your Team '{participant[1]}' **successfully left** the Tournament.")
                     desc = f"`❌` Team **{participant[1]}** left the Tournament."
