@@ -2,7 +2,7 @@ aiohttp==3.4.4
 aiosqlite==0.8.0
 async-timeout==3.0.1
 attrs==18.2.0
-certifi==2018.11.29
+certifi==2022.12.7
 cffi==1.11.5
 chardet==3.0.4
 discord.py==1.0.0a1621+g66e5033
